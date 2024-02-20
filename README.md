@@ -39,3 +39,50 @@ When the user opens the game, he/she should be presented to a page where he/she 
 
 If there are more than 2 players in the counter and it does not reach 4 players before 20 seconds, a 10 second timer starts, to players get ready to start the game.
 If there are 4 players in the counter before 20 seconds, the 10 seconds timer starts and the game starts.
+
+## Linking the front-end server to the back-end server
+
+1. In the 'frontend' folder make an '.env' file that contains the *environment* variable: 
+```js
+WEB_PILOT_APP_API_URL=http://localhost:1234
+DANGEROUSLY_DISABLE_HOST_CHECK=true
+```
+2. Each jsx component file will include the *environment* variable:
+``` jsx
+const apiURL = process.env.WEB_PILOT_APP_API_URL;
+```
+The *environment* variable is included inside each 'fetch' js function like for instance:
+``` js
+let data = fetch(`${apiURL}/chat`, {
+    method: "POST",
+    headers: {
+    "Content-Type": "application/json",
+    },
+    body: JSON.stringify(getConversation),
+    credentials: 'include',
+})
+   .then(response => response.json())
+    .then((data) => {
+        return data
+    } )
+```
+
+# To install Parcel.js:
+1. to generate the package.json file: 
+   npm init
+
+2. to install the Parcel bundler locally: 
+   npm install --save-dev parcel
+
+In the root directory:
+1. to start the development server: 
+   npx parcel static/index.html
+
+2. add npm scripts to start and build mini-framework:
+   Open the package.json file, and
+   Change the 'main' field from "main": "index.js" to "source": "static"/index.html"
+   Underneath "source", add 
+   "scripts": {
+       "start": "parcel",
+       "build": "parcel build --dist-dir public"
+     },

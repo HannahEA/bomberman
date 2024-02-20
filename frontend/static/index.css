@@ -1,0 +1,75 @@
+  /* bomberman font by Samrad */
+@font-face {
+    font-family: "BomberFont";
+    src: url("../fonts/bomberman.ttf") format("truetype");
+}
+
+:root {
+  --background: rgb(238, 240, 236);
+  --text: hsl(0, 0%, 80%);
+  --clear: hsl(0, 0%, 65%);
+  --disabled: hsl(0, 0%, 35%);
+  --purple: #bb73e6;
+
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+font-family: "BomberFont";
+  letter-spacing: 1.5px;
+  background: var(--background);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-content: center;
+  width: 100vw;
+  height: 100vh;
+  padding: 5rem;
+  font-size: 12px;
+}
+
+.circle {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  position: absolute;
+  opacity: 0.75;
+}
+
+.box {
+  width: 750px;
+  height: 25vh;
+  background-color: hsl(0, 85%, 61%);
+  border: solid 1px var(--clear);
+  border-color: hsl(0, 85%, 61%);
+  border-radius: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center; 
+}
+
+#nickNm {
+    width: 450px;
+    height: 50px;
+    background-color: white;
+    border: none;
+    border-radius: 15px;
+    color: hsl(0,85%, 61%);
+    justify-content: center;
+    margin-right: 35px;
+    font-family: "BomberFont";
+    font-size: 30px;
+    padding-left: 30px;
+}
+
+#message1{
+    margin:auto;
+    color: white;
+    font-size: xx-large;
+    margin-left: 30px;
+}
