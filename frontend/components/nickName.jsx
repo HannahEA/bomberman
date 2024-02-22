@@ -1,10 +1,8 @@
+import { Block } from "@material-ui/icons";
 import {Web_pilot} from "../../web_pilot/web_pilot.jsx"
-import Professor_Buggler from "../static/Professor_Buggler.png"
+import Professor_Buggler from "../static/Professor_B.png"
 
 //const apiURL = process.env.WEB_PILOT_APP_API_URL;
-
-
-export var numPlayers = 0;
 
 
 /** @jsx Web_pilot.createElement */
@@ -13,6 +11,7 @@ export function NickNames(props){
 //to collect new player's nickname
 function GrabNkNm(e){
     if(e.key === 'Enter' && e.target.value !== ""){
+        let numPlayers = props.players.length;
         numPlayers++;
         props.setNr(() => numPlayers);
         //get player's nick name
@@ -25,6 +24,13 @@ function GrabNkNm(e){
         props.setPlayers(() => names)
         console.log("the names array, the players state var. array, the numPlayers and the names.length:", names, props.players, numPlayers, names.length)
         e.target.value = "";
+
+        if(names.length > 0){
+            document.getElementById('nickName').style.display = 'none'; 
+            //background color: #1f3956
+            document.getElementById('waitForPlayers').style.display = 'block';
+
+        }
     }
 
 }

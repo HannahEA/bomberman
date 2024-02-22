@@ -40,9 +40,35 @@ When the user opens the game, he/she should be presented to a page where he/she 
 If there are more than 2 players in the counter and it does not reach 4 players before 20 seconds, a 10 second timer starts, to players get ready to start the game.
 If there are 4 players in the counter before 20 seconds, the 10 seconds timer starts and the game starts.
 
+## How to create your project using the **Web_pilot** framework
+
+1. Add 'web_pilot/web_pilot.jsx' to the root of your repository.
+2. Add other folders and files to the root e.g. *frontend-->components-->static* and *backend-->webSocket* etc.
+3. in VSC terminal:
+   a) Generate the *node_modules* and corresponding *package.json* file by typing: `npm init`
+   b) Install the Parcel bundler locally by typing `npm install --save-dev parcel`. See instructions in the following paragraphs.
+4. In the *static* folder link the *index.html* file to the *app.jsx* file e.g.:
+```jsx
+<body>
+  <script type="module" src="../components/app.jsx"></script>
+</body>
+```
+5. Include the below comment above each **Web_pilot** component in the jsx files:
+```jsx
+/** @jsx Web_pilot.createElement */
+```
+6. Import and return your components in the *app.jsx* file and render the `App` component through **Web_pilot** functions:
+```js
+   let appendHere = document.getElementsByTagName("body")[0];
+   let showNkNm = Web_pilot.createElement(App);
+   Web_pilot.render(showNkNm, appendHere);
+```
+7. Type `npm start` in VSC terminal to run your project and type `localhost:1234` in the browser.
+
+
 ## Linking the front-end server to the back-end server
 
-1. In the 'frontend' folder make an '.env' file that contains the *environment* variable: 
+1. In the 'frontend' folder make an *.env* file that contains the *environment* variable: 
 ```js
 WEB_PILOT_APP_API_URL=http://localhost:1234
 DANGEROUSLY_DISABLE_HOST_CHECK=true
@@ -67,22 +93,29 @@ let data = fetch(`${apiURL}/chat`, {
     } )
 ```
 
-# To install Parcel.js:
+# To install Parcel.js in VSC type:
 1. to generate the package.json file: 
+ ```js  
    npm init
-
+```
 2. to install the Parcel bundler locally: 
-   npm install --save-dev parcel
+   ```js
+      npm install --save-dev parcel
+   ```
 
 In the root directory:
 1. to start the development server: 
+```js
    npx parcel static/index.html
+```
 
 2. add npm scripts to start and build mini-framework:
    Open the package.json file, and
-   Change the 'main' field from "main": "index.js" to "source": "static"/index.html"
+   Change the 'main' field from 
+   `"main": "index.js"` to e.g. `"source": "static"/index.html"`
    Underneath "source", add 
-   "scripts": {
+   `"scripts": {
        "start": "parcel",
        "build": "parcel build --dist-dir public"
      },
+     `
