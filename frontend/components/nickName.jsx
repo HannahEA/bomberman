@@ -1,6 +1,6 @@
 import { Block } from "@material-ui/icons";
 import {Web_pilot} from "../../web_pilot/web_pilot.jsx"
-import Professor_Buggler from "../static/Professor_B.png"
+import Professor_Buggler from "../static/Professor_Buggler.png"
 
 //const apiURL = process.env.WEB_PILOT_APP_API_URL;
 

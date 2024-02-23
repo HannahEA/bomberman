@@ -119,3 +119,6 @@ In the root directory:
        "build": "parcel build --dist-dir public"
      },
      `
+
+
+## Upload to AthenaHTA2 Bomberman-dom
