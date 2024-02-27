@@ -1,22 +1,16 @@
 {
-    "name": "mini-framework",
-    "version": "1.0.0",
-    "description": "(01F JS project #5)",
-    "source": "static/index.html",
-    "scripts": {
-      "start": "parcel static/index.html",
-      "build": "parcel build --dist-dir public"
-    },
-    "repository": {
-      "type": "git",
-      "url": "(https://learn.01founders.co/git/AthenaHTA2/mini-framework.git)"
-    },
-    "keywords": [
-      "(react)"
-    ],
-    "author": " (Hannah Alemu, Helena Sedmak)",
-    "license": "ISC",
-    "devDependencies": {
-      "parcel": "^2.10.3"
-    }
+  "name": "bomberman",
+  "version": "1.0.0",
+  "description": "Bomberman Objectives For this project you have to create a bomberman alike game, where multiple players can join in and battle until one of them is the last man standing.",
+  "source": "./static/index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "parcel static/index.html"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "parcel": "^2.11.0"
+  },
+  "type": "module" 
 }
