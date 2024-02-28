@@ -4,6 +4,13 @@ import { WaitForPlayers } from "./waitForPlayers.jsx";
 
 const apiURL = process.env.WEB_PILOT_APP_API_URL;
 
+/*Does not return a WebSocket
+const ws = new WebSocket("ws://localhost:8082")
+console.log("the WebSocket error is:", ws.error, ws);
+ws.addEventListener("open", () => {
+  console.log("We have connected to the WebSocket server!")
+});
+*/
 
 /** @jsx Web_pilot.createElement */
 export function App() {

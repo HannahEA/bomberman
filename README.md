@@ -65,6 +65,16 @@ If there are 4 players in the counter before 20 seconds, the 10 seconds timer st
 ```
 7. Type `npm start` in VSC terminal to run your project and type `localhost:1234` in the browser.
 
+## How to implement a WebSocket in JavaScript
+*https://www.npmjs.com/package/ws?activeTab=readme*
+
+1. To install the Node.js WebSocket library in VSC terminal: 
+   ```js
+   npm install --save ws
+   ```
+2. 
+
+
 
 ## Linking the front-end server to the back-end server
 
@@ -101,6 +111,10 @@ let data = fetch(`${apiURL}/chat`, {
 2. to install the Parcel bundler locally: 
    ```js
       npm install --save-dev parcel
+   ```
+   or, to install Parcel bundler globally:
+   ```js
+      npm install -g parcel-bundler
    ```
 
 In the root directory:

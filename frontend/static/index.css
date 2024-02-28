@@ -96,6 +96,20 @@
     font-size: 16px;
   }
 
+  #chatContainer{
+    display:flex;
+    align-items: center;
+  }
+
+  #chat {
+      width: 300px;
+      height: 300px;
+      border: 1px solid #ccc;
+      padding: 10px;
+      overflow-y: scroll;
+  }
+
+
   span.game {
     height: 678px;
     width: 680px;
