@@ -29,7 +29,9 @@ function GrabNkNm(e){
             document.getElementById('nickName').style.display = 'none'; 
             //background color: #1f3956
             document.getElementById('waitForPlayers').style.display = 'block';
-
+            document.getElementById('chat').style.display = 'block';
+            document.getElementById('message').style.display = 'block';
+            document.getElementById('send').style.display = 'block';
         }
     }
 
