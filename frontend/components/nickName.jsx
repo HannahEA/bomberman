@@ -2,7 +2,7 @@ import { Block } from "@material-ui/icons";
 import {Web_pilot} from "../../web_pilot/web_pilot.jsx"
 import Professor_Buggler from "../static/Professor_Buggler.png"
 
-//const apiURL = process.env.WEB_PILOT_APP_API_URL;
+const apiURL = process.env.WEB_PILOT_APP_API_URL;
 
 
 /** @jsx Web_pilot.createElement */
@@ -25,11 +25,20 @@ function GrabNkNm(e){
         console.log("the names array, the players state var. array, the numPlayers and the names.length:", names, props.players, numPlayers, names.length)
         e.target.value = "";
 
-        if(names.length > 0){
+        //send nickname to WS
+        props.socket.send(JSON.stringify({
+            type:"nickName",
+            nickname: nkNm
+        }));
+        
+        if(names.length >= 1){
             document.getElementById('nickName').style.display = 'none'; 
+            console.log("the names array values are:", names );
             //background color: #1f3956
             document.getElementById('waitForPlayers').style.display = 'block';
-
+            document.getElementById('chat').style.display = 'block';
+            document.getElementById('message').style.display = 'block';
+            document.getElementById('send').style.display = 'block';
         }
     }
 
