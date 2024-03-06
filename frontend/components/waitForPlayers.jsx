@@ -79,7 +79,7 @@ export function WaitForPlayers(props) {
         }
     
         function init() {
-          if (ws) {
+          if (ws) {I feel so lucky!j
             ws.onerror = ws.onopen = ws.onclose = null;
             ws.close();
           }

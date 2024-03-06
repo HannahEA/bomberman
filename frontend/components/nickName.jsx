@@ -25,8 +25,9 @@ function GrabNkNm(e){
         console.log("the names array, the players state var. array, the numPlayers and the names.length:", names, props.players, numPlayers, names.length)
         e.target.value = "";
 
-        if(names.length > 0){
+        if(names.length >= 2){
             document.getElementById('nickName').style.display = 'none'; 
+            console.log("the names array values are:", names );
             //background color: #1f3956
             document.getElementById('waitForPlayers').style.display = 'block';
             document.getElementById('chat').style.display = 'block';

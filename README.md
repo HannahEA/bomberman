@@ -63,7 +63,12 @@ If there are 4 players in the counter before 20 seconds, the 10 seconds timer st
    let showNkNm = Web_pilot.createElement(App);
    Web_pilot.render(showNkNm, appendHere);
 ```
-7. Type `npm start` in VSC terminal to run your project and type `localhost:1234` in the browser.
+
+7. In the root folder, install Babel with VSC terminal command: 
+```js
+npm install --save-dev @babel/core @babel/preset-env @babel/preset-react
+```
+8. Type `npm start` in VSC terminal to run your project and type `localhost:1234` in the browser.
 
 ## How to implement a WebSocket in JavaScript
 *https://www.npmjs.com/package/ws?activeTab=readme*
@@ -123,16 +128,23 @@ In the root directory:
    npx parcel static/index.html
 ```
 
-2. add npm scripts to start and build mini-framework:
+2. add npm scripts to start and build Bomberman-dom:
    Open the package.json file, and
    Change the 'main' field from 
-   `"main": "index.js"` to e.g. `"source": "static"/index.html"`
+   ```js 
+   "main": "index.js"
+   ``` 
+   to e.g. 
+   ```js
+   "source": "static/index.html"
+   ```
    Underneath "source", add 
-   `"scripts": {
+   ```js
+   "scripts": {
        "start": "parcel",
        "build": "parcel build --dist-dir public"
      },
-     `
+     ```
 
 
 ## Upload to AthenaHTA2 Bomberman-dom
