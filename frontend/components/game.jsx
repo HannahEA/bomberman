@@ -7,6 +7,7 @@ const url = "https://drive.google.com/drive/u/0/folders/1MN3N9JVBdpcHj7dPlnEbvff
 class TileMap {
     constructor(tileSize) {
      this.tileSize = tileSize
+     this.imageLoaded = false
      this.grass = this.#image("https://as2.ftcdn.net/v2/jpg/04/04/01/49/1000_F_404014988_7N8rNOa9ezLOZx6O6JEscLyNCpLLZhGW.jpg")
     //  this.wall = this.#image("wall.jpeg")
     //  this.brick = this.#image("brick.webp")
@@ -20,7 +21,10 @@ class TileMap {
         img.onerror = (errorMsg) => {
             console.log("img error", errorMsg, fileName)
         }
-        img.onload = ()=> {console.log("image has loaded 2")}
+        img.onload = ()=> {
+            this.imageLoaded = true
+            console.log("image has loaded 2")
+        }
         return img
     }
 
@@ -56,22 +60,36 @@ class TileMap {
         ctx.fillRect(0, 0, canvas.width, canvas.height)
     }
     #drawMap(ctx) {
-        for (let row = 0; row < this.map.length; row++) {
+        if (this.imageLoaded) {
+            console.log("for real loaded")
+             for (let row = 0; row < this.map.length; row++) {
             for (let column = 0; column < this.map[row].length; column++) {
                 const tile = this.map[row][column];
-                if (tile === 0) {
+                if (tile === 0  ) {
                     console.log("Drawing grass tile at:", row, column);
+                    // let pattern = ctx.createPattern(this.grass, "repeat")
+                    // ctx.fillStyle = pattern
+                    // ctx.fillRect(column * this.tileSize,
+                    //     row * this.tileSize,
+                    //     32,
+                    //     32)
                     ctx.drawImage(
                         this.grass,
-                        column * this.tileSize,
-                        row * this.tileSize,
-                        this.tileSize,
-                        this.tileSize
+                        0,
+                        0,
+                        779,
+                        779,
+                        column * 20,
+                        row * 10,
+                        20,
+                        10
                     );
                 }
             }
         }
     }
+        }
+       
     // #drawMap(ctx, canvas) {
         
     //         for (let row= 0; row< this.map.length; row++) {
@@ -118,15 +136,15 @@ class TileMap {
 export function GameLoad() {
         const canvas = document.getElementById("game")
         const ctx = canvas.getContext("2d")
-        const di = document.getElementById("di") 
+        // const di = document.getElementById("di") 
         console.log("canvas", canvas, ctx)
         const tileSize = 32
         const tileMap = new TileMap(tileSize)
      
         function gameLoop() {
-            tileMap.draw(canvas, ctx, di)
+            tileMap.draw(canvas, ctx)
         }
-        gameLoop()
+        setInterval(gameLoop, 1000)
         // requestAnimationFrame(gameLoop, 1000/60)
     }
 
