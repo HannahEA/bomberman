@@ -17,6 +17,7 @@ export function App() {
 
     //Create WebSocket connection
     const socket = new WebSocket('ws://localhost:8080');
+    var numPlayers = 0;
 
     socket.addEventListener("error", (event) => {
     console.log("Error from socket WS:", event);
@@ -34,6 +35,26 @@ export function App() {
     // Handle incoming messages
     socket.addEventListener('message', function (event) {
       console.log("event inside message front end", event);
+
+      var msg = JSON.parse(event.data)
+
+    switch (msg.type) {
+
+        case "openMessage":
+            console.log("event.data.data", msg.data);
+            break;
+        case "clientsMap":
+            console.log("length of players array", msg.data.length);
+            numPlayers = msg.data.length;
+            let numPlay = document.getElementById('numPlay');
+            if(numPlayers > 0){
+              numPlay.innerHTML = `Number of Players:  ${numPlayers}`;
+            }else{
+              numPlay.innerHTML = 'Number of Players:  0';
+            }
+            break;
+    }
+
       const message = document.createElement('div');
       
       //turn chars into string, from event object: {"type":"Buffer","data":[72,101,108,108,111,32,83,101,114,118,101,114,33]}
@@ -66,6 +87,7 @@ export function App() {
                 players={players}
                 setPlayers={setPlayers}
                 socket={socket}
+                numPlayers={numPlayers}
             />
             <Chat 
                 socket={socket}

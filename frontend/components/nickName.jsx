@@ -25,7 +25,13 @@ function GrabNkNm(e){
         console.log("the names array, the players state var. array, the numPlayers and the names.length:", names, props.players, numPlayers, names.length)
         e.target.value = "";
 
-        if(names.length >= 2){
+        //send nickname to WS
+        props.socket.send(JSON.stringify({
+            type:"nickName",
+            nickname: nkNm
+        }));
+        
+        if(names.length >= 1){
             document.getElementById('nickName').style.display = 'none'; 
             console.log("the names array values are:", names );
             //background color: #1f3956

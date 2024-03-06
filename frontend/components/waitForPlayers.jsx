@@ -55,7 +55,8 @@ export function WaitForPlayers(props) {
             timeInterval = setInterval(startTimer, 1000);
           }, 200);
 
-    let numPlay = `Number of Players:  ${props.nr}`;
+
+        
     //using window.onload so the id='numPlay' will be rendered before js refers to it 
     // window.onload = function() {
     //     let opponents = document.querySelector("#numPlay");
@@ -119,7 +120,7 @@ export function WaitForPlayers(props) {
                 </div>
                 <div>
                     <span className="info">
-                        <h2 id="numPlay" >{numPlay}</h2>
+                        <h2 id="numPlay" >0</h2>
                     </span>
                     <span className="info">
                         <h2 id="lives" >Lives:</h2>

@@ -153,6 +153,8 @@ console.log('WebSocket server started on port 8080');
 import { WebSocketServer } from 'ws';
 
 const wss = new WebSocketServer({ port: 8080 });
+//var clients = [];
+const clients = new Map();
 
 
 wss.on('connection', function connection(ws) {
@@ -162,6 +164,31 @@ wss.on('connection', function connection(ws) {
 
   ws.on('message', function message(data) {
     console.log('received: %s', JSON.parse(data));
+
+    let wsMessage = JSON.parse(data);
+
+    switch (wsMessage.type) {
+
+      case 'nickName':
+        console.log('Bomberman client nickname:', wsMessage.nickname);
+       clients.set(wsMessage.nickname, ws);
+       for (let [nickname, ws] of clients) {
+        console.log(nickname, ws);
+        ws.send(JSON.stringify({ type:'clientsMap', data: Array.from(clients.keys()) }));
+       }
+      //  ws.send(JSON.stringify({ type:'clientsMap', data: Array.from(clients.keys()) }  ;
+        break;
+
+      case 'openMessage':
+        console.log('Bomberman client open', wsMessage.data);
+        break;
+    }
+
+    wss.clients.forEach(function each(client) {
+      if (client !== ws && client.readyState === WebSocketServer.OPEN) {
+        client.send(data);
+      }
+    });
     ws.send(JSON.stringify({
       type: 'message',
       data: data
