@@ -3,7 +3,9 @@ import Explosion from "../static/explosion.gif"
 import AngelHeart from "../static/Angel_Heart.png"
 import { GameLoad } from "./game.jsx";
 
+import WebSocket from 'ws';
 
+const apiURL = process.env.REACT_APP_API_URL;
 
 /** @jsx Web_pilot.createElement */
 export function WaitForPlayers(props) {
@@ -74,12 +76,60 @@ export function WaitForPlayers(props) {
         //wait 200 milliseconds before start timer
       
 
-    let numPlay = `Number of Players:  ${props.nr}`;
+
+        
     //using window.onload so the id='numPlay' will be rendered before js refers to it 
     // window.onload = function() {
     //     let opponents = document.querySelector("#numPlay");
     //     opponents.innerHTML = `Number of Players:  ${props.nr}`;
     // }
+
+    //=====> Start of bomberChat function <========
+    /*
+    //renders the chat and sends messages to all clients through ws
+    (function() {
+        const sendBtn = document.querySelector('#send');
+        const messages = document.querySelector('#messages');
+        const messageBox = document.querySelector('#messageBox');
+    
+        let ws;
+    
+        function showMessage(message) {
+          messages.textContent += `\n\n${message}`;
+          messages.scrollTop = messages.scrollHeight;
+          messageBox.value = '';
+        }
+    
+        function init() {
+          if (ws) {I feel so lucky!j
+            ws.onerror = ws.onopen = ws.onclose = null;
+            ws.close();
+          }
+    
+          ws = new WebSocket('ws://localhost:8082');
+          ws.onopen = () => {
+            console.log('Connection opened!');
+          }
+          ws.onmessage = ({ data }) => showMessage(data);
+          ws.onclose = function() {
+            ws = null;
+          }
+        }
+    
+        sendBtn.onclick = function() {
+          if (!ws) {
+            showMessage("No WebSocket connection :(");
+            return ;
+          }
+    
+          ws.send(messageBox.value);
+          showMessage(messageBox.value);
+        }
+    
+        init();
+      })();
+      */
+    //=====> End of bomberChat function <========
     
 
     return (
@@ -91,7 +141,7 @@ export function WaitForPlayers(props) {
                 </div>
                 <div>
                     <span className="info">
-                        <h2 id="numPlay" >{numPlay}</h2>
+                        <h2 id="numPlay" >0</h2>
                     </span>
                     <span className="info">
                         <h2 id="lives" >Lives:</h2>
@@ -124,6 +174,14 @@ export function WaitForPlayers(props) {
                         <h3>'space bar' to shoot</h3>
                         <h3><strong>⇦ ⇨</strong> move left right</h3> */}
                     </div>
+                    {/* <div className="bomberChat">
+                        <span>
+                        <h1>Bomberman Chat</h1>
+                        <pre id="messages" style="height: 400px; overflow: scroll"></pre>
+                        <input type="text" id="messageBox" placeholder="Type your message here" style="display: block; width: 100%; margin-bottom: 10px; padding: 10px;" />
+                        <button id="send" title="Send Message!" style="width: 100%; height: 30px;">Send Message</button>
+                        </span>
+                        </div> */}
                 </div>
             </center>
         </div>
