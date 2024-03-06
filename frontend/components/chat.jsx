@@ -40,7 +40,10 @@ export function Chat(props) {
         const message = messageInput.value;
         console.log('button click value:', messageInput.value)
         if (message.trim() !== '') {
-            props.socket.send(message);
+            props.socket.send(JSON.stringify({
+                type: "chatMessage",
+                message: message
+            }));
             messageInput.value = ''; // Clear input field after sending
         }
     });
