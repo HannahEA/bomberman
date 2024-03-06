@@ -158,10 +158,10 @@ const wss = new WebSocketServer({ port: 8080 });
 wss.on('connection', function connection(ws) {
   ws.on('error', console.error);
 
-  ws.send('Bomberman websocket live !  Ciao Helena !');
+  ws.send('Bomberman Hannah websocket is on');
 
   ws.on('message', function message(data) {
-    console.log('received: %s', data);
+    console.log('received: %s', JSON.parse(data));
     ws.send(JSON.stringify({
       type: 'message',
       data: data

@@ -11,6 +11,10 @@ const apiURL = process.env.WEB_PILOT_APP_API_URL;
 /** @jsx Web_pilot.createElement */
 export function App() {
 
+    const chat = document.getElementById('chat');
+    const messageInput = document.getElementById('message');
+    const sendButton = document.getElementById('send');
+
     //Create WebSocket connection
     const socket = new WebSocket('ws://localhost:8080');
 
@@ -20,7 +24,11 @@ export function App() {
 
     // Connection opened
     socket.addEventListener("open", (event) => {
-      socket.send("Hello Server! Bomberman Helena is here!",event);
+        let openMsg = "Hello Server! One more Bomberman is here!"
+      socket.send(JSON.stringify({
+        type: "openMessage",
+        data: openMsg
+      }));
     });
 
     // Handle incoming messages

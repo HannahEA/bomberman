@@ -35,7 +35,7 @@ export function Chat(props) {
         chat.scrollTop = chat.scrollHeight; // Scroll chat to bottom
     });*/
 
-    // Send message when Send button is clicked
+    // Send Bomberman nickname to server when Send button is clicked
     sendButton.addEventListener('click', function () {
         const message = messageInput.value;
         console.log('button click value:', messageInput.value)
@@ -45,7 +45,7 @@ export function Chat(props) {
         }
     });
 
-    // Send message when Enter key is pressed
+    // Send Bomberman nickname to server when Enter key is pressed
     messageInput.addEventListener('keypress', function (event) {
         if (event.key === 'Enter') {
             sendButton.click();
