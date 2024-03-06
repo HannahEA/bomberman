@@ -43,6 +43,7 @@ export function App() {
         case "openMessage":
             console.log("event.data.data", msg.data);
             break;
+
         case "clientsMap":
             console.log("length of players array", msg.data.length);
             numPlayers = msg.data.length;
@@ -53,6 +54,12 @@ export function App() {
               numPlay.innerHTML = 'Number of Players:  0';
             }
             break;
+
+        case "chatMessage":
+            const message = document.createElement('div');
+            message.textContent = msg.data;
+            chat.appendChild(message);
+            chat.scrollTop = chat.scrollHeight; // Scroll chat to bottom
     }
 
       const message = document.createElement('div');
