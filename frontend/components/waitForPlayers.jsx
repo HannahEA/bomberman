@@ -1,6 +1,7 @@
 import { Web_pilot } from "../../web_pilot/web_pilot.jsx"
 import Explosion from "../static/explosion.gif"
 import AngelHeart from "../static/Angel_Heart.png"
+import { GameLoad } from "./game.jsx";
 
 import WebSocket from 'ws';
 
@@ -13,6 +14,7 @@ export function WaitForPlayers(props) {
     //Stop Watch from: https://codepen.io/madrine256/details/KKoRvBb
     const timerContainer = document.querySelector('#time');//get timer element
     let timeInterval = null,//time stamp at game start
+    timer  = null,
     timeStatus = false,
     minutes = 0,
     seconds = 0,
@@ -23,6 +25,7 @@ export function WaitForPlayers(props) {
     //This is the timer function
     function startTimer() {
         seconds++;
+        
         //if seconds dived by 60 = 1 set back the seconds to 0 and increment the minutes 
         if (seconds / 60 === 1) {
             seconds = 0;
@@ -41,19 +44,37 @@ export function WaitForPlayers(props) {
             leadingMins = minutes;
         };
 
-
+        console.log("time", seconds)
         //Change timer text content to actaul stop watch
         //timerContainer.innerHTML = `Count down: ${leadingMins} : ${leadingSecs}`;
         timerContainer.innerHTML = `Count down: ${leadingSecs}`;
         // showLeadingSecs = `Count down: ${leadingSecs}`;
         // console.log("LeadingSeconds",showLeadingSecs);
+        
+        //load game when the countdown is finished
+        if (seconds === 3 ) {
+        let waitingPlayer = document.getElementById("waitForPlayers")
+        let game = document.getElementById("game")
+        clear()
+        waitingPlayer.style.display = "none"
+        game.style.display = "block"  
+        GameLoad()
     }
-
-        //wait 200 milliseconds before start timer
-        setTimeout(function(){
-            timeStatus = true;
+    }
+    function clear() {
+        console.log(timer, timeInterval)
+        clearTimeout(timer)
+        clearInterval(timeInterval)
+    }
+        if  (document.getElementById('waitForPlayers')) {
+            timer = setTimeout(function(){
+            timeStatus = true; 
             timeInterval = setInterval(startTimer, 1000);
           }, 200);
+        }
+      
+        //wait 200 milliseconds before start timer
+      
 
 
         

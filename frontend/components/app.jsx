@@ -1,6 +1,7 @@
 import { Web_pilot } from "../../web_pilot/web_pilot";
 import { NickNames } from "./nickName";
 import { WaitForPlayers } from "./waitForPlayers.jsx";
+import { Game } from "./game.jsx";
 import {Chat} from "./chat.jsx";
 var http = require('http');
 
@@ -92,6 +93,7 @@ export function App() {
             <Chat 
                 socket={socket}
             />
+            <Game/>
         </div>
     )
 }
