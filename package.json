@@ -1,16 +1,25 @@
 {
   "name": "bomberman",
   "version": "1.0.0",
-  "description": "Bomberman Objectives For this project you have to create a bomberman alike game, where multiple players can join in and battle until one of them is the last man standing.",
-  "source": "./static/index.html",
+  "description": "01F JS project #6: web application using Web_pilot framework",
+  "source": "frontend/static/index.html",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "parcel static/index.html"
+    "start": "parcel frontend/static/index.html",
+    "build": "parcel build --dist-dir public"
   },
-  "author": "",
+  "repository": {
+    "type": "git",
+    "url": "(https://learn.01founders.co/git/AthenaHTA2/bomberman-dom.git)"
+  },
+  "keywords": [
+    "(Web_pilot)"
+  ],
+  "author": "Hannah Alemu, Helena Sedmak",
   "license": "ISC",
   "devDependencies": {
     "parcel": "^2.11.0"
   },
-  "type": "module" 
+  "dependencies": {
+    "@material-ui/icons": "^4.11.3"
+  }
 }
