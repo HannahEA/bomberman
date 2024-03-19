@@ -40,13 +40,14 @@ When the user opens the game, he/she should be presented to a page where he/she 
 If there are more than 2 players in the counter and it does not reach 4 players before 20 seconds, a 10 second timer starts, to players get ready to start the game.
 If there are 4 players in the counter before 20 seconds, the 10 seconds timer starts and the game starts.
 
+
 ## How to create your project using the **Web_pilot** framework
 
 1. Add 'web_pilot/web_pilot.jsx' to the root of your repository.
 2. Add other folders and files to the root e.g. *frontend-->components-->static* and *backend-->webSocket* etc.
 3. in VSC terminal:
-   a) Generate the *node_modules* and corresponding *package.json* file by typing: `npm init`
-   b) Install the Parcel bundler locally by typing `npm install --save-dev parcel`. See instructions in the following paragraphs.
+   (a) Generate the *node_modules* and corresponding *package.json* file by typing: `npm init`
+   (b) Install the Parcel bundler locally by typing `npm install --save-dev parcel`. See instructions in below paragraphs.
 4. In the *static* folder link the *index.html* file to the *app.jsx* file e.g.:
 ```jsx
 <body>
@@ -68,20 +69,62 @@ If there are 4 players in the counter before 20 seconds, the 10 seconds timer st
 ```js
 npm install --save-dev @babel/core @babel/preset-env @babel/preset-react
 ```
-8. Type `npm start` in VSC terminal to run your project and type `localhost:1234` in the browser.
+8. To run your project from VSC, in a split terminal navigate to the *frontend* and the *backend/server* folders and type:
+ ```js
+ npm start
+ ```
+   Or, to start the development server (*frontend* folder only) type: 
+```js
+   npx parcel static/index.html
+```
+ When the *backend* and the *frontend* servers are running, in the browser type url:
+  ```js
+  localhost:1234
+  ```
 
-## How to implement a WebSocket in JavaScript
+
+## How to implement a webSocket using the JavaScript *ws* library
 *https://www.npmjs.com/package/ws?activeTab=readme*
 
-1. To install the Node.js WebSocket library in VSC terminal: 
+### In the root folder make one *Backend* and one *Frontend* folder.
+   In each *frontend* and *bakcend* folder type below VSC terminal commands:
+   1. To create a node module:
+   ```js
+   npm init
+   ```
+   2. To install the Node.js WebSocket library: 
    ```js
    npm install --save ws
    ```
-2. 
+### In the *frontend* folder only, install Parcel:
+   1. To install the Parcel bundler in the *frontend* folder only: 
+   ```js
+      npm install --save-dev parcel
+   ```
+   2. To install Parcel bundler globally from the root folder:
+   ```js
+      npm install -g parcel-bundler
+   ```
+   3. In *frontend* folder's *package.json* file, add npm scripts to start and build Bomberman:
 
+      Change the 'main' field from 
+      ```js 
+         "main": "index.js"
+      ``` 
+      to e.g. 
+      ```js
+         "source": "static/index.html"
+      ```
+      Underneath "source", add: 
+      ```js
+      "scripts": {
+       "start": "parcel",
+       "build": "parcel build --dist-dir public"
+      },
+      ```
 
-
-## Linking the front-end server to the back-end server
+## How to link the front-end React server to the back-end GO server 
+## *(Not relevant here but useful to know)*
 
 1. In the 'frontend' folder make an *.env* file that contains the *environment* variable: 
 ```js
@@ -108,43 +151,4 @@ let data = fetch(`${apiURL}/chat`, {
     } )
 ```
 
-# To install Parcel.js in VSC type:
-1. to generate the package.json file: 
- ```js  
-   npm init
-```
-2. to install the Parcel bundler locally: 
-   ```js
-      npm install --save-dev parcel
-   ```
-   or, to install Parcel bundler globally:
-   ```js
-      npm install -g parcel-bundler
-   ```
 
-In the root directory:
-1. to start the development server: 
-```js
-   npx parcel static/index.html
-```
-
-2. add npm scripts to start and build Bomberman-dom:
-   Open the package.json file, and
-   Change the 'main' field from 
-   ```js 
-   "main": "index.js"
-   ``` 
-   to e.g. 
-   ```js
-   "source": "static/index.html"
-   ```
-   Underneath "source", add 
-   ```js
-   "scripts": {
-       "start": "parcel",
-       "build": "parcel build --dist-dir public"
-     },
-     ```
-
-
-## Upload to AthenaHTA2 Bomberman-dom

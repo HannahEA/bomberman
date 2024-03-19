@@ -97,6 +97,13 @@
     font-size: 16px;
   }
 
+  .countdown {
+    display: none;
+    font-family: "BomberFont";
+    color: hsl(0, 85%, 61%);
+    font-size: 16px;
+  }
+
   #chatContainer{
     display:flex;
     justify-content:center;

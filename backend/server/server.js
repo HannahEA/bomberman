@@ -160,10 +160,10 @@ const clients = new Map();
 wss.on('connection', function connection(ws) {
   ws.on('error', console.error);
 
-  ws.send('Bomberman Hannah websocket is on');
+  ws.send(JSON.stringify('Welcome from server!'));
 
   ws.on('message', function message(data) {
-    console.log('received: %s', JSON.parse(data));
+    console.log('received from client: %s', JSON.parse(data));
 
     let wsMessage = JSON.parse(data);
 
@@ -174,13 +174,58 @@ wss.on('connection', function connection(ws) {
         break;
       //new client nickname
       case 'nickName':
-        console.log('Bomberman client nickname:', wsMessage.nickname);
-        clients.set(wsMessage.nickname, ws);
-        for (let [nickname, ws] of clients) {
-          console.log(nickname, ws);
-          ws.send(JSON.stringify({ type: 'clientsMap', data: Array.from(clients.keys()) }));
+        if (clients.has(wsMessage.nickname && wsMessage.join === true)) {
+          ws.send(JSON.stringify({ type: 'nkNameChk', data: 'Nickname exists, try again' }));
+          return;
+        } else if (clients.size <= 4 && wsMessage.join === true) {
+          console.log('Bomberman client nickname:', wsMessage.nickname);
+          //add client to clients map
+          clients.set(wsMessage.nickname, ws);
+          //send welcome message to client
+          ws.send.JSON.stringify({ type: 'nkNameChk', data: 'Welcome Bomberman!' });
+          //send clients map to all clients
+          for (let [nickname, ws] of clients) {
+            console.log(nickname, ws);
+            ws.send(JSON.stringify({ type: 'clientsMap', data: Array.from(clients.keys()) }));
+          }
+          //send message to be displayed in waitForPlayers
+          if (clients.size === 1) { //countdown on hold if there is only 1 player
+            ws.send(JSON.stringify({ type: 'countdownMsg', data: 'You are first' }));
+
+          } else if (clients.size >= 2 && clients.size < 4) { //start 20 second countdown if there are 2-3 players
+            for (let [nickname, ws] of clients) {
+              console.log(nickname, ws);
+              ws.send(JSON.stringify({ type: 'countdownMsg', data: 'Waiting for more players' }));
+            }
+
+          } else if (clients.size === 4) { //start 10 second countdown if there are 4 players
+            for (let [nickname, ws] of clients) {
+              console.log(nickname, ws);
+              ws.send(JSON.stringify({ type: 'countdownMsg', data: 'Game starting in 10 seconds' }));
+            }
+          }
         }
         break;
+
+      //start 10 seconds count down after 20 seconds have passed
+      case 'countdownMsg':
+        console.log('countdownMsg:', wsMessage.data);
+        for (let [nickname, ws] of clients) {
+          console.log(nickname, ws);
+          ws.send(JSON.stringify({ type: 'countdownMsg', data: wsMessage.data }));
+        }
+        break;
+
+      //game starts
+      case 'gameOn':
+        console.log('gameOn:', wsMessage.data);
+        for (let [nickname, ws] of clients) {
+          console.log("client: ", nickname, ws);
+          ws.send(JSON.stringify({ type: 'gameOn', data: wsMessage.data }));
+        }
+        break;
+
+
       //client message
       case 'chatMessage':
         console.log('Bomberman client chat', wsMessage.message);
