@@ -9,8 +9,98 @@ const apiURL = process.env.WEB_PILOT_APP_API_URL;
 
 
 
+
+
 /** @jsx Web_pilot.createElement */
 export function App() {
+
+
+  //========================================================
+  //========== START OF Timer Variables and Functions ======
+  //========================================================
+
+  //~~~~~~~~~~~~~~Timer variables start~~~~~~~~~~~~~~~~~~~~~
+  //Stop Watch from: https://codepen.io/madrine256/details/KKoRvBb
+  let timeInterval = null,//time stamp at game start
+    timer = null,
+    timeStatus = false,
+    minutes = 0,
+    seconds = 0,
+    leadingMins = 0,
+    leadingSecs = 0;
+  //~~~~~~~~~~~~~~Timer variables end~~~~~~~~~~~~~~~~~~~~~~~
+
+  //~~~~~~~~~~~~~~Timer functions start~~~~~~~~~~~~~~~~~~~~~~
+  function startTimer() {
+    seconds++;
+
+    //if seconds dived by 60 = 1 set back the seconds to 0 
+    //and increment the minutes 
+
+    if (seconds / 60 === 1) {
+      seconds = 0;
+      minutes++;
+    }
+    //add zero if seconds are less than 10
+    if (seconds < 10) {
+      leadingSecs = '0' + seconds.toString();
+    } else {
+      leadingSecs = seconds;
+    };
+    //add zero if minutes are less than 10
+    if (minutes < 10) {
+      leadingMins = '0' + minutes.toString();
+    } else {
+      leadingMins = minutes;
+    };
+  }
+
+
+  function clear() {
+    console.log(timer, timeInterval)
+    clearTimeout(timer)
+    clearInterval(timeInterval)
+  }
+
+  // 10 seconds to start and no one else joins
+  function tenSecondsStart() {
+    clearTimeout(timer);
+    clearInterval(timeInterval);
+    timer = setTimeout(function () {
+      timeStatus = true;
+      timeInterval = setInterval(startTimer, 1000);
+    }, 200);
+  }
+
+  function tenSecondsEnd() {
+    clearTimeout(timer);
+    clearInterval(timeInterval);
+    timeStatus = false;
+  }
+
+  if (waiting === 'wait20' || waiting === 'wait10') {
+    timer = setTimeout(function () {
+      timeStatus = true;
+      timeInterval = setInterval(startTimer, 1000);
+    }, 200);
+  }
+
+  /*
+    if (document.getElementById('waitForPlayers')) {
+      timer = setTimeout(function () {
+        timeStatus = true;
+        timeInterval = setInterval(startTimer, 1000);
+      }, 200);
+    }
+    */
+  //wait 200 milliseconds before start timer
+
+  //~~~~~~~~~~~~~~Timer functions end~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+  //========================================================
+  //========== END OF Timer Variables and Functions ========
+  //========================================================
 
   const [nr, setNr] = Web_pilot.useState(0)
   const [players, setPlayers] = Web_pilot.useState([]);
@@ -19,13 +109,14 @@ export function App() {
   const messageInput = document.getElementById('message');
   const sendButton = document.getElementById('send');
 
+
   //Create WebSocket connection
   const socket = new WebSocket('ws://localhost:8080');
   var nNameChk = '';
   var thePlayers = [];
   var numPlayers = 0;
-  var countdown = document.getElementById('countdown');
-  var countTen = '';
+  // var countdown = document.getElementById('countdown');
+  var waiting = '';
   let waitMsg = '';
   var gameStart = 'waitGame';
 
@@ -45,14 +136,14 @@ export function App() {
 
   // Handle incoming messages
   socket.addEventListener('message', function (event) {
-    console.log("event inside message front end", event);
+    console.log("event inside message front end", event.data);
 
     var msg = JSON.parse(event.data)
-
+    console.log("Type inside message event:", msg.type); 
     switch (msg.type) {
 
       case "openMessage":
-        console.log("event.data.data", msg.data);
+        console.log("event.data", msg.data);
         break;
       case "nkNameChk":
         console.log("nkNameChk message:", msg.data);
@@ -70,35 +161,62 @@ export function App() {
         //update state variables
         setPlayers(() => thePlayers);
         setNr(() => numPlayers);
-        //update the number of players in the front-end
-        let numPlay = document.getElementById('numPlay');
-        if (numPlayers > 0 && numPlayers < 5) {
-          numPlay.innerHTML = `Number of Players:  ${numPlayers}`;
-        } else {
-          numPlay.innerHTML = 'Number of Players:  0';
-        }
         break;
 
       case "countdownMsg":
         waitMsg = msg.data;
 
         if (waitMsg === 'You are first') {
-          countTen = '';
-          //hide the countdown timer
-          document.getElementById('info').style.display = "none";
-          //display the countdown message
-          countdown.innerHTML = waitMsg;
+          //do not start timer
+          waiting = 'waitForPlayers';
+          //hide the timer
+          // document.getElementById('info').style.display = "none";
+          // //display the wait message
+          // countdown.innerHTML = waitMsg;
         } else if (waitMsg === 'Waiting for more players') {
-          //show the countdown timer
-          document.getElementById('info').style.display = "block";
-          countdown.innerHTML = waitMsg;
           //start the timer
-          countTen = 'wait10';
+          waiting = 'wait20';
+          //send seconds and leadingSecs
+
+          //show the timer
+          // document.getElementById('info').style.display = "block";
+          // //display the wait message
+          // countdown.innerHTML = waitMsg;
+
+        } else if (waitMsg === 'Waiting for more players' && leadingSecs === 20) {
+          //start the 10 seconds countdown
+          waiting = 'wait10';
+
+          //send signal  to WS server so that 10 seconds countdown can begin
+          socket.send(JSON.stringify({
+            type: "countdownMsg",
+            data: 'Game starting in 10 seconds'
+          }));
+
         } else if (waitMsg === 'Game starting in 10 seconds') {
-          countTen = 'start10';
-          countdown.innerHTML = waitMsg;
+
+          waiting = 'start10';
+          //re-start timer        
+          tenSecondsStart();
+          //send seconds and leadingSecs
+
+          //show the timer
           countdown.style.display = "block";
-          countTen = 'start10'
+          //display the wait message
+          countdown.innerHTML = waitMsg;
+
+        } else if (waitMsg === 'Game starting in 10 seconds' && leadingSecs === 10) {
+
+          waiting = 'gameOn';
+          //send game starts signal to WS
+          props.socket.send(JSON.stringify({
+            type: 'countdownMsg',
+            data: 'gameOn'
+          }));
+
+          //stop the timer
+          tenSecondsEnd()
+
           break;
         }
 
@@ -108,13 +226,15 @@ export function App() {
         message.textContent = msg.data;
         chat.appendChild(message);
         chat.scrollTop = chat.scrollHeight; // Scroll chat to bottom
-    }
+        break;
+    }//end of switch msg.type
 
+//=============== START potential duplicate of above =======================
     const message = document.createElement('div');
 
     //turn chars into string, from event object: {"type":"Buffer","data":[72,101,108,108,111,32,83,101,114,118,101,114,33]}
-    const dataArray = event.target.data.data;
-    console.log("event.data.data", dataArray)
+    const dataArray = event.target.data;
+    console.log("event.data", dataArray.data)
     const stringData = String.fromCharCode(...dataArray);
 
     console.log(stringData);
@@ -122,7 +242,7 @@ export function App() {
     chat.appendChild(stringData);
     chat.scrollTop = chat.scrollHeight; // Scroll chat to bottom
   });
-
+//=============== END potential duplicate of above =======================
 
 
 
@@ -146,7 +266,8 @@ export function App() {
         socket={socket}
         numPlayers={numPlayers}
         waitMsg={waitMsg}
-        countTen={countTen}
+        waiting={waiting}
+        leadingSecs={leadingSecs}
       />
       <Chat
         socket={socket}

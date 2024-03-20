@@ -7,12 +7,16 @@ import WebSocket from 'ws';
 
 const apiURL = process.env.REACT_APP_API_URL;
 
+
 /** @jsx Web_pilot.createElement */
 export function WaitForPlayers(props) {
+
+    var countdown = document.getElementById('countdown');
 
     //~~~~~~~~~~~~~~Timer variables start~~~~~~~~~~~~
     //Stop Watch from: https://codepen.io/madrine256/details/KKoRvBb
     const timerContainer = document.querySelector('#time');//get timer element
+    /*
     let timeInterval = null,//time stamp at game start
         timer = null,
         timeStatus = false,
@@ -20,9 +24,11 @@ export function WaitForPlayers(props) {
         seconds = 0,
         leadingMins = 0,
         leadingSecs = 0;
+    */
     //~~~~~~~~~~~~~~Timer variables end~~~~~~~~~~~~
 
-    //This is the timer function
+    //~~~~~~~~~~~~~~Timer function start~~~~~~~~~~~~
+    /*
     function startTimer() {
         seconds++;
 
@@ -43,92 +49,126 @@ export function WaitForPlayers(props) {
         } else {
             leadingMins = minutes;
         };
+    }
+    */
+    //~~~~~~~~~~~~~~Timer function end~~~~~~~~~~~~
 
-        //if there is only 1 player, the timer will not start
-        if(props.numPlayers === 1){
-        let inf = document.getElementById('countdownTen')
-        info.innerHTML = props.countdownTen
+    //possible values for waiting = 'waitForPlayers', 'wait20', 'wait10'
+    //if there is only 1 player, display greeting and the timer will not start
+
+    //first player to join the game
+    if (props.waiting === 'waitForPlayers') {
+        //hide the timer
+        document.getElementById('info').style.display = "none";
+        //display the wait message
+        countdown.innerHTML = props.waitMsg;
 
         //start the timer when there are at least 2 players
-        } else if (props.numPlayers >= 2) {
+    } else if (props.waiting === 'wait20') {
+        //show the timer
+        document.getElementById('info').style.display = "block";
+        //show seconds
+        timerContainer.innerHTML = `Count down: ${props.leadingSecs}`;
+        //display the wait message
+        countdown.innerHTML = props.waitMsg;
 
-        console.log("time", seconds)
-        //Change timer text content to actaul stop watch
-        //timerContainer.innerHTML = `Count down: ${leadingMins} : ${leadingSecs}`;
-        timerContainer.innerHTML = `Count down: ${leadingSecs}`;
-        // showLeadingSecs = `Count down: ${leadingSecs}`;
-        // console.log("LeadingSeconds",showLeadingSecs);
+        //start the 10 seconds countdown when 20 seconds have passed
+    } else if (props.waiting === 'start10') {
+        //show the timer
+        document.getElementById('info').style.display = "block";
+        //show seconds
+        timerContainer.innerHTML = `Count down: ${props.leadingSecs}`;
+        //display the wait message
+        countdown.innerHTML = props.waitMsg;
+    }
+    /*
+    //to be moved inside app.jsx:
+    //start the 10 seconds countdown if seconds = 20 & # players= 2 or 3
+    if (props.waiting === 'waitTen' && seconds === 20) {
+
+        //let waitingPlayer = document.getElementById("waitForPlayers")
+        //let game = document.getElementById("game")
+
+        tenSecondsStart()
+        //waitingPlayer.style.display = "none"
+        //game.style.display = "block"  
+        //GameLoad()
+
+        //send signal to start 10 seconds countdown to WS
+        props.socket.send(JSON.stringify({
+            type: "countdownMsg",
+            data: 'Game starting in 10 seconds'
+        }));
+
+
+    }
+    */
+    //load game when the 10 seconds countdown is finished
+    //moved to app.jsx
+    else if (props.waiting === 'gameOn') {
+        //tenSecondsEnd()
+        let waitingPlayer = document.getElementById("waitForPlayers")
+        let game = document.getElementById("game")
+        waitingPlayer.style.display = "none"
+        game.style.display = "block"
+        GameLoad()
+
+        //send game starts signal to WS
+        //moved to app.jsx
+        /* props.socket.send(JSON.stringify({
+             type: 'gameOn',
+             data: 'May the best win!'
+         }));
+         */
+    }
+
+
+    //}
+
+
+
+    /*
+        function clear() {
+            console.log(timer, timeInterval)
+            clearTimeout(timer)
+            clearInterval(timeInterval)
         }
-        //start the 10 seconds countdown if # players is 4 or seconds = 20 & # players >1 <4
-        if (numPlayers > 1 && numPlayers < 4 && seconds === 20 ) {
-
-            //let waitingPlayer = document.getElementById("waitForPlayers")
-            //let game = document.getElementById("game")
-
-            tenSecondsStart()
-            //waitingPlayer.style.display = "none"
-            //game.style.display = "block"  
-            //GameLoad()
-
-            //send signal to start 10 seconds countdown to WS
-            props.socket.send(JSON.stringify({
-                type: "countdownMsg",
-                data: 'Game starting in 10 seconds'
-            }));
-
-
+    
+        // 10 seconds to start and no one else joins
+        function tenSecondsStart() {
+    
+            clearTimeout(timer);
+            clearInterval(timeInterval);
+            timer = setTimeout(function () {
+                timeStatus = true;
+                timeInterval = setInterval(startTimer, 1000);
+            }, 200);
         }
-
-        //load game when the 10 seconds countdown is finished
-        if (props.countTen === 'start10' && seconds === 10) {
-            tenSecondsEnd()
-            let waitingPlayer = document.getElementById("waitForPlayers")
-            let game = document.getElementById("game")
-            waitingPlayer.style.display = "none"
-            game.style.display = "block"
-            GameLoad()
-
-            //send game starts signal to WS
-            props.socket.send(JSON.stringify({
-                type: 'gameOn',
-                data: 'May the best win!'
-            }));
+    
+        function tenSecondsEnd() {
+            clearTimeout(timer);
+            clearInterval(timeInterval);
+            timeStatus = false;
         }
-
-
-    }
-
-
-    function clear() {
-        console.log(timer, timeInterval)
-        clearTimeout(timer)
-        clearInterval(timeInterval)
-    }
-
-    // 10 seconds to start and no one else joins
-    function tenSecondsStart() {
-
-        clearTimeout(timer);
-        clearInterval(timeInterval);
-        timerNew = setTimeout(function () {
-            timeStatus = true;
-            timeInterval = setInterval(startTimer, 1000);
-        }, 200);
-    }
-
-    function tenSecondsEnd() {
-        clearTimeout(timerNew);
-        clearInterval(timeInterval);
-        timeStatus = false;
-    }
+    
+        if (document.getElementById('waitForPlayers')) {
+            timer = setTimeout(function () {
+                timeStatus = true;
+                timeInterval = setInterval(startTimer, 1000);
+            }, 200);
+        }
+        //wait 200 milliseconds before start timer
+        */
 
     if (document.getElementById('waitForPlayers')) {
-        timer = setTimeout(function () {
-            timeStatus = true;
-            timeInterval = setInterval(startTimer, 1000);
-        }, 200);
+        //update the number of players in the front-end
+        let numPlay = document.getElementById('numPlay');
+        if (props.numPlayers > 0 && props.numPlayers < 5) {
+            numPlay.innerHTML = `Number of Players:  ${props.numPlayers}`;
+        } else {
+            numPlay.innerHTML = 'Number of Players:  0';
+        }
     }
-
     //wait 200 milliseconds before start timer
 
 

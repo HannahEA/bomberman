@@ -13,8 +13,8 @@ export function NickNames(props) {
         if (e.key === 'Enter' && e.target.value !== "") {
             //let numPlayers = props.players.length;
             //====> Check if I am missing one player from 'players' and 'nr' state variables: <=======
-            console.log("Inside GrabNkNm: *** 'players' and 'nr' state vars ***: %n", props.players, props.nr)
-            console.log("Inside GrabNkNm: *** 'thePlayers' and 'numPlayers' array vars ***: %n", props.thePlayers, props.numPlayers)
+            console.log("Inside GrabNkNm: *** 'players' and 'nr' state vars ***: ", props.players, props.nr)
+            console.log("Inside GrabNkNm: *** 'thePlayers' and 'numPlayers' array vars ***: ",props.thePlayers, props.numPlayers)
             //adding one player to account for delay in refreshing 'players' state variable
             if (props.numPlayers < 4) {
                 //add the new player to the 'nr' state variable
