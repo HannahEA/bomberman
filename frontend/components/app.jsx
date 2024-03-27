@@ -3,9 +3,9 @@ import { NickNames } from "./nickName";
 import { WaitForPlayers } from "./waitForPlayers.jsx";
 import { Game } from "./game.jsx";
 import { Chat } from "./chat.jsx";
-var http = require('http');
+//var http = require('http');
 
-const apiURL = process.env.WEB_PILOT_APP_API_URL;
+//const apiURL = process.env.WEB_PILOT_APP_API_URL;
 
 
 
@@ -57,43 +57,29 @@ export function App() {
 
 
   function clear() {
-    console.log(timer, timeInterval)
+    //console.log(timer, timeInterval)
+    timeStatus = false;
     clearTimeout(timer)
     clearInterval(timeInterval)
   }
 
   // 10 seconds to start and no one else joins
   function tenSecondsStart() {
-    clearTimeout(timer);
-    clearInterval(timeInterval);
     timer = setTimeout(function () {
       timeStatus = true;
       timeInterval = setInterval(startTimer, 1000);
     }, 200);
   }
 
-  function tenSecondsEnd() {
-    clearTimeout(timer);
-    clearInterval(timeInterval);
-    timeStatus = false;
-  }
-
-  if (waiting === 'wait20' || waiting === 'wait10') {
+  //2 or 3 players have joined
+  function twentySecondsStart() {
+    //wait 200 milliseconds before starting timer
     timer = setTimeout(function () {
       timeStatus = true;
       timeInterval = setInterval(startTimer, 1000);
     }, 200);
   }
-
-  /*
-    if (document.getElementById('waitForPlayers')) {
-      timer = setTimeout(function () {
-        timeStatus = true;
-        timeInterval = setInterval(startTimer, 1000);
-      }, 200);
-    }
-    */
-  //wait 200 milliseconds before start timer
+  
 
   //~~~~~~~~~~~~~~Timer functions end~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -102,12 +88,13 @@ export function App() {
   //========== END OF Timer Variables and Functions ========
   //========================================================
 
+
   const [nr, setNr] = Web_pilot.useState(0)
   const [players, setPlayers] = Web_pilot.useState([]);
 
   const chat = document.getElementById('chat');
-  const messageInput = document.getElementById('message');
-  const sendButton = document.getElementById('send');
+  //const messageInput = document.getElementById('message');
+  //const sendButton = document.getElementById('send');
 
 
   //Create WebSocket connection
@@ -136,10 +123,10 @@ export function App() {
 
   // Handle incoming messages
   socket.addEventListener('message', function (event) {
-    console.log("event inside message front end", event.data);
+    //console.log("event inside message front end", event.data);
 
     var msg = JSON.parse(event.data)
-    console.log("Type inside message event:", msg.type); 
+
     switch (msg.type) {
 
       case "openMessage":
@@ -155,7 +142,7 @@ export function App() {
         break;
       //array of cients sent from back-end server to front-end to clients
       case "clientsMap":
-        console.log("thePlayers array and numPlayers:%n", msg.data, msg.data.length);
+        //console.log("thePlayers array and numPlayers:%n", msg.data, msg.data.length);
         thePlayers = msg.data;
         numPlayers = msg.data.length;
         //update state variables
@@ -173,49 +160,47 @@ export function App() {
           // document.getElementById('info').style.display = "none";
           // //display the wait message
           // countdown.innerHTML = waitMsg;
-        } else if (waitMsg === 'Waiting for more players') {
-          //start the timer
+        } else if (waitMsg === 'Waiting for more players' && numPlayers === 2) {
+          //countdown starts at 20 seconds
           waiting = 'wait20';
-          //send seconds and leadingSecs
-
-          //show the timer
-          // document.getElementById('info').style.display = "block";
-          // //display the wait message
-          // countdown.innerHTML = waitMsg;
+          //start timer to send seconds and leadingSecs 
+          twentySecondsStart();
 
         } else if (waitMsg === 'Waiting for more players' && leadingSecs === 20) {
           //start the 10 seconds countdown
-          waiting = 'wait10';
-
+          //waiting = 'wait10';
+          //stop the timer
+          //clear()
+          //re-start the timer for 10 seconds
+          //tenSecondsStart();
           //send signal  to WS server so that 10 seconds countdown can begin
           socket.send(JSON.stringify({
             type: "countdownMsg",
             data: 'Game starting in 10 seconds'
           }));
-
+          //there are four players
         } else if (waitMsg === 'Game starting in 10 seconds') {
-
-          waiting = 'start10';
+          //start the 10 seconds countdown
+          waiting = 'wait10';
+          //stop the timer
+          clear()
           //re-start timer        
           tenSecondsStart();
-          //send seconds and leadingSecs
-
-          //show the timer
-          countdown.style.display = "block";
-          //display the wait message
-          countdown.innerHTML = waitMsg;
-
+          //send signal  to WS server so that 10 seconds countdown can begin
+          socket.send(JSON.stringify({
+            type: "countdownMsg",
+            data: 'Game starting in 10 seconds'
+          }));
         } else if (waitMsg === 'Game starting in 10 seconds' && leadingSecs === 10) {
-
           waiting = 'gameOn';
           //send game starts signal to WS
-          props.socket.send(JSON.stringify({
+          socket.send(JSON.stringify({
             type: 'countdownMsg',
             data: 'gameOn'
           }));
 
           //stop the timer
-          tenSecondsEnd()
+          clear()
 
           break;
         }
@@ -229,7 +214,8 @@ export function App() {
         break;
     }//end of switch msg.type
 
-//=============== START potential duplicate of above =======================
+    //=============== START potential duplicate of above =======================
+    /*
     const message = document.createElement('div');
 
     //turn chars into string, from event object: {"type":"Buffer","data":[72,101,108,108,111,32,83,101,114,118,101,114,33]}
@@ -241,8 +227,10 @@ export function App() {
     message.textContent = stringData;
     chat.appendChild(stringData);
     chat.scrollTop = chat.scrollHeight; // Scroll chat to bottom
+      */
   });
-//=============== END potential duplicate of above =======================
+
+  //=============== END potential duplicate of above =======================
 
 
 

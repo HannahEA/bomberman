@@ -12,49 +12,51 @@ const apiURL = process.env.REACT_APP_API_URL;
 export function WaitForPlayers(props) {
 
     var countdown = document.getElementById('countdown');
-
-    //~~~~~~~~~~~~~~Timer variables start~~~~~~~~~~~~
-    //Stop Watch from: https://codepen.io/madrine256/details/KKoRvBb
     const timerContainer = document.querySelector('#time');//get timer element
-    /*
-    let timeInterval = null,//time stamp at game start
-        timer = null,
-        timeStatus = false,
-        minutes = 0,
-        seconds = 0,
-        leadingMins = 0,
-        leadingSecs = 0;
-    */
-    //~~~~~~~~~~~~~~Timer variables end~~~~~~~~~~~~
 
-    //~~~~~~~~~~~~~~Timer function start~~~~~~~~~~~~
-    /*
-    function startTimer() {
-        seconds++;
-
-        //if seconds dived by 60 = 1 set back the seconds to 0 and increment the minutes 
-        if (seconds / 60 === 1) {
-            seconds = 0;
-            minutes++;
-        }
-        //add zero if seconds are less than 10
-        if (seconds < 10) {
-            leadingSecs = '0' + seconds.toString();
-        } else {
-            leadingSecs = seconds;
-        };
-        //add zero if minutes are less than 10
-        if (minutes < 10) {
-            leadingMins = '0' + minutes.toString();
-        } else {
-            leadingMins = minutes;
-        };
-    }
-    */
-    //~~~~~~~~~~~~~~Timer function end~~~~~~~~~~~~
 
     //possible values for waiting = 'waitForPlayers', 'wait20', 'wait10'
     //if there is only 1 player, display greeting and the timer will not start
+    //get server greeting and players array
+    props.socket.addEventListener('message', function (event) {
+        var msg = JSON.parse(event.data)
+
+        switch (msg.type) {
+            case 'countdownMsg':
+                // console.log("msg.data and msg.type", msg.data, msg.type);
+                if (msg.data === 'You are first') {
+                    //hide the timer
+                    document.getElementById('info').style.display = "none";
+                    //display message
+                    countdown.innerHTML = msg.data;
+                    return
+                } else if (msg.data === 'Waiting for more players' || msg.data === 'Game starting in 10 seconds') {
+                    //show the timer
+                    document.getElementById('info').style.display = "block";
+                    //show seconds
+                    timerContainer.innerHTML = `Count down: ${props.leadingSecs}`;
+                    countdown.innerHTML = msg.data;
+                    return
+                } else if (msg.data === 'Game starting in 10 seconds') {
+                    countdown.innerHTML = msg.data;
+                    return
+                }
+                break;
+            case 'clientsMap':
+                let y = msg.data.length;
+                props.numPlayers = y;
+                //update the number of players in the front-end
+                let numPlay = document.getElementById('numPlay');
+                if (props.numPlayers > 0 && props.numPlayers < 5) {
+                    numPlay.innerHTML = `Number of Players:  ${props.numPlayers}`;
+                    return;
+                } else {
+                    numPlay.innerHTML = 'Number of Players:  0';
+                }
+                break;
+
+        }
+    });
 
     //first player to join the game
     if (props.waiting === 'waitForPlayers') {
@@ -73,7 +75,7 @@ export function WaitForPlayers(props) {
         countdown.innerHTML = props.waitMsg;
 
         //start the 10 seconds countdown when 20 seconds have passed
-    } else if (props.waiting === 'start10') {
+    } else if (props.waiting === 'wait10') {
         //show the timer
         document.getElementById('info').style.display = "block";
         //show seconds
