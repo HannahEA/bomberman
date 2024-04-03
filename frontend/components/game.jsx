@@ -28,7 +28,7 @@ class TileMap {
      this.imageLoaded = false
      this.grass = image("https://as2.ftcdn.net/v2/jpg/04/04/01/49/1000_F_404014988_7N8rNOa9ezLOZx6O6JEscLyNCpLLZhGW.jpg", this)
      this.wall = image("https://camo.githubusercontent.com/61647ead3b3a03496f2a0e6ed8676632e55b50c494f6842bc0b087c4452d73df/68747470733a2f2f643364796661663369757472786f2e636c6f756466726f6e742e6e65742f696d6167652f75706c6f61642f63343864376234636564313034373732386339356434303832353462653665642e6a706567", this)
-     this.brick = image("https://cdn-icons-png.freepik.com/512/7352/7352969.png", this)
+     this.brick = image("https://pics.craiyon.com/2023-12-30/LIDMoh3_RPyYQSIjxDaPqw.webp", this)
      
     }
 
@@ -89,8 +89,8 @@ class TileMap {
                                 this.brick,
                                 0,
                                 0,
-                                530,
-                                530,
+                                850,
+                                850,
                                 column * 20,
                                 row * 10,
                                 20,
@@ -136,6 +136,7 @@ class TileMap {
             }
             
         }
+        this.imageLoaded = false
     }
         
     }
@@ -216,7 +217,7 @@ export function GameLoad(numPlayers, position) {
                 console.log("what player am i?", self)
             }
         }
-
+        let boardDrawn = false
         //initialise game     
         function initGame() {
             console.log("init loop")
@@ -224,6 +225,7 @@ export function GameLoad(numPlayers, position) {
             //// after images have loaded
             if (tileMap.imageLoaded) {
                 console.log("drawing game board")
+                boardDrawn = true
               tileMap.draw(canvas, ctx)
             }
             // draw players
@@ -236,7 +238,8 @@ export function GameLoad(numPlayers, position) {
                 }
             })
             let loadedPlayers = players.filter((p) => p.imageLoaded)
-            if (loadedPlayers.length == numPlayers && tileMap.imageLoaded ) {
+            console.log(loadedPlayers.length, numPlayers, boardDrawn)
+            if (loadedPlayers.length == numPlayers && boardDrawn ) {
                 initFinish()
             }
             
@@ -244,12 +247,13 @@ export function GameLoad(numPlayers, position) {
 
         function initFinish() {
             console.log("init finish")
+            console.log("original tilemap",  tileMap.map)
             window.requestAnimationFrame(gameLoop)
             clearInterval(initId)
             
         }
 
-        let initId = setInterval(initGame, 1000/60)
+        let initId = setInterval(initGame, 1000)
         
         
     }
@@ -301,7 +305,7 @@ export function GameLoad(numPlayers, position) {
          //cX position can not be greater than the x position of the last grass tile
          if (count%5 == 0) {
             
-            console.log("position in tilemap", self.cRow, self.cCol, tileMap.map)
+           
             if (direction == "right" && tileMap.map[self.cRow][self.cCol+1] != 1 &&  tileMap.map[self.cRow][self.cCol+1] != 2) { 
                 //self.cX<255 
                 console.log("moving", direction, tileMap.map[self.cRow, self.cCol+1])

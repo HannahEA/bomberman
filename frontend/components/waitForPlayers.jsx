@@ -3,6 +3,7 @@ import Explosion from "../static/explosion.gif"
 import AngelHeart from "../static/Angel_Heart.png"
 import { GameLoad } from "./game.jsx";
 
+
 import WebSocket from 'ws';
 
 const apiURL = process.env.REACT_APP_API_URL;
@@ -10,22 +11,27 @@ const apiURL = process.env.REACT_APP_API_URL;
 /** @jsx Web_pilot.createElement */
 export function WaitForPlayers(props) {
 
-//~~~~~~~~~~~~~~Timer variables start~~~~~~~~~~~~
+    //var countdown = document.getElementById('countdown');
+    //var time = document.getElementById("time");
+
+    //~~~~~~~~~~~~~~Timer variables start~~~~~~~~~~~~
     //Stop Watch from: https://codepen.io/madrine256/details/KKoRvBb
     const timerContainer = document.querySelector('#time');//get timer element
     let timeInterval = null,//time stamp at game start
-    timer  = null,
-    timeStatus = false,
-    minutes = 0,
-    seconds = 0,
-    leadingMins = 0,
-    leadingSecs = 0;
-//~~~~~~~~~~~~~~Timer variables end~~~~~~~~~~~~
+        timer = null,
+        timeStatus = false,
+        minutes = 0,
+        seconds = 0,
+        leadingMins = 0,
+        leadingSecs = 0,
+        leadSecs = "";
+    //~~~~~~~~~~~~~~Timer variables end~~~~~~~~~~~~
 
     //This is the timer function
+
     function startTimer() {
         seconds++;
-        
+
         //if seconds dived by 60 = 1 set back the seconds to 0 and increment the minutes 
         if (seconds / 60 === 1) {
             seconds = 0;
@@ -47,7 +53,7 @@ export function WaitForPlayers(props) {
         console.log("time", seconds)
         //Change timer text content to actaul stop watch
         //timerContainer.innerHTML = `Count down: ${leadingMins} : ${leadingSecs}`;
-        timerContainer.innerHTML = `Count down: ${leadingSecs}`;
+        //timerContainer.innerHTML = `Count down: ${leadingSecs}`;
         // showLeadingSecs = `Count down: ${leadingSecs}`;
         // console.log("LeadingSeconds",showLeadingSecs);
         
@@ -64,23 +70,27 @@ export function WaitForPlayers(props) {
         GameLoad(n, p)
     }
     }
-    function clear() {
+
+
+
+    /*function clear() {
         console.log(timer, timeInterval)
         clearTimeout(timer)
         clearInterval(timeInterval)
     }
-        if  (document.getElementById('waitForPlayers')) {
-            timer = setTimeout(function(){
-            timeStatus = true; 
-            timeInterval = setInterval(startTimer, 1000);
-          }, 200);
-        }
-      
-        //wait 200 milliseconds before start timer
-      
+    /*   
+   if  (document.getElementById('waitForPlayers')) {
+           timer = setTimeout(function(){
+           timeStatus = true; 
+           timeInterval = setInterval(startTimer, 1000);
+         }, 200);
+       }
+     */
+    //wait 200 milliseconds before start timer
 
 
-        
+
+
     //using window.onload so the id='numPlay' will be rendered before js refers to it 
     // window.onload = function() {
     //     let opponents = document.querySelector("#numPlay");
@@ -133,7 +143,65 @@ export function WaitForPlayers(props) {
       })();
       */
     //=====> End of bomberChat function <========
-    
+
+    props.socket.addEventListener("message", (event) => {
+
+        var msg = JSON.parse(event.data);
+
+        //console.log("lobby receives message:", msg);
+        //countdown.innerHTML = `${msg}`
+
+        switch (msg.type) {
+
+            case "countdownMsg":
+                if (msg.data === 'You are first') {
+                    //hide the timer
+                    if (document.getElementById("waitForPlayers")) {
+                        document.getElementById("time").style.display = "none";
+                        //display message
+                        document.getElementById("countdown").innerHTML = msg.data;
+                    } else {
+                        console.log("Lobby: no waitForPlayers")
+                    }
+                    //countdown.innerHTML = msg.data;
+
+                } else if (msg.data === 'Waiting for more players') {
+                    //show the timer
+                    if (document.querySelector(".waitForPlayers")) {
+                        document.getElementById("time").style.display = "block";
+                        document.getElementById("countdown").innerHTML = msg.data;
+                    } else {
+                        console.log("Lobby: no waitForPlayers")
+                    }
+                    //display message
+                    //let countdown = document.getElementById('countdown');
+                    //countdown.innerHTML = msg.data;
+                }
+                break
+
+
+            case "seconds":
+
+                leadSecs = msg.data;
+                console.log("lobby receives seconds:", leadSecs)
+                document.querySelector('#time').innerHTML = `Count down: ${leadSecs}`;
+
+                //load game when the countdown is finished
+                if (leadSecs === 20) {
+                    let waitingPlayer = document.getElementById("waitForPlayers")
+                    let game = document.getElementById("game")
+                   
+                    waitingPlayer.style.display = "none"
+                    game.style.display = "block"
+                    let n = localStorage.getItem("numPlayers")
+                    let p = localStorage.getItem("position")
+                    GameLoad(n, p)
+                }
+        }
+    });
+
+
+
 
     return (
         <div id="waitForPlayers">
@@ -150,12 +218,12 @@ export function WaitForPlayers(props) {
                         <h2 id="lives" >Lives:</h2>
                     </span>
                     <span className="info">
-                            <img className="angel" id="heart1" src={AngelHeart} alt="angel_heart" />
-                            <img className="explosion" id="explosion1" src={Explosion} alt="explosion" />
-                            <img className="angel" id="heart2" src={AngelHeart} alt="angel_heart" />
-                            <img className="explosion" id="explosion2" src={Explosion} alt="explosion" />
-                            <img className="angel" id="heart3" src={AngelHeart} alt="angel_heart" />
-                            <img className="explosion" id="explosion3" src={Explosion} alt="explosion" />
+                        <img className="angel" id="heart1" src={AngelHeart} alt="angel_heart" />
+                        <img className="explosion" id="explosion1" src={Explosion} alt="explosion" />
+                        <img className="angel" id="heart2" src={AngelHeart} alt="angel_heart" />
+                        <img className="explosion" id="explosion2" src={Explosion} alt="explosion" />
+                        <img className="angel" id="heart3" src={AngelHeart} alt="angel_heart" />
+                        <img className="explosion" id="explosion3" src={Explosion} alt="explosion" />
                     </span>
                 </div>
                 <div className="game-container">
@@ -166,9 +234,9 @@ export function WaitForPlayers(props) {
                     </span>
                     <div className="menu">
 
-                    <span className="info">
-                        <h2 id="time" >Count down: 00</h2>
-                    </span>
+                        <span className="info">
+                            <h2 id="time" >Count down: 00</h2>
+                        </span>
 
                         {/* <h3>'p' to play</h3>
                         <h3>'s' to stop</h3>
@@ -177,6 +245,7 @@ export function WaitForPlayers(props) {
                         <h3>'space bar' to shoot</h3>
                         <h3><strong>⇦ ⇨</strong> move left right</h3> */}
                     </div>
+                    <div id="countdown"></div>
                     {/* <div className="bomberChat">
                         <span>
                         <h1>Bomberman Chat</h1>

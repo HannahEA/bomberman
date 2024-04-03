@@ -149,6 +149,8 @@ wss.on('connection', (ws) => {
 console.log('WebSocket server started on port 8080');
 */
 
+
+
 //Esteban test backend server that works in a separate file
 import { WebSocketServer } from 'ws';
 
@@ -158,9 +160,18 @@ const clients = new Map();
 
 
 wss.on('connection', function connection(ws) {
+
+  let timeInterval = null,//time stamp at game start
+    timer = null,
+    timeStatus = false,
+    minutes = 0,
+    seconds = 0,
+    leadingMins = 0,
+    leadingSecs = 0;
+
   ws.on('error', console.error);
 
-  ws.send('Bomberman Hannah websocket is on');
+  ws.send(JSON.stringify('Bomberman Hannah websocket is on'));
 
   ws.on('message', function message(data) {
     console.log('received: %s', JSON.parse(data));
@@ -169,11 +180,15 @@ wss.on('connection', function connection(ws) {
 
     switch (wsMessage.type) {
 
+      case 'openMessage':
+        console.log('Bomberman client open', wsMessage.data);
+        break;
+      //new client nickname
       case 'nickName':
         console.log('Bomberman client nickname:', wsMessage.nickname);
        clients.set(wsMessage.nickname, ws);
        for (let [nickname, ws] of clients) {
-        
+        ////MERGE 
         if(nickname === wsMessage.nickname) {
           ws.send(
             JSON.stringify(
@@ -198,10 +213,53 @@ wss.on('connection', function connection(ws) {
         ;
        }
       //  ws.send(JSON.stringify({ type:'clientsMap', data: Array.from(clients.keys()) }  ;
-        break;
+        
+        clients.set(wsMessage.nickname, ws);
+        //send the array of Bombermans to all clients
+        for (let [nickname, ws] of clients) {
+          console.log(nickname);
+          ws.send(JSON.stringify({
+            type: 'clientsMap',
+            data: Array.from(clients.keys())
+          }));
+        }
 
-      case 'openMessage':
-        console.log('Bomberman client open', wsMessage.data);
+        //greeting for first Bomberman
+        if (clients.size === 1) {
+          //console.log("there is one client now!")
+          ws.send(JSON.stringify({
+            type: 'countdownMsg',
+            data: 'You are first'
+          }));
+          //Greeting for second Bomberman
+        } else if (clients.size === 2) {
+          //send greeting & start timer
+          for (let [nickname, ws] of clients) {
+            //console.log(nickname, ws);
+            ws.send(JSON.stringify({
+              type: 'countdownMsg',
+              data: 'Waiting for more players'
+            }));
+          }
+          timer = setTimeout(function () {
+            timeStatus = true;
+            timeInterval = setInterval(startTimer, 1000);
+          }, 100);
+
+          
+
+          //console.log("server sends seconds:", leadingSecs);
+
+        }
+
+        break;
+      //client message
+      case 'chatMessage':
+        console.log('Bomberman client chat', wsMessage.message);
+        for (let [nickname, ws] of clients) {
+          //console.log(nickname, ws);
+          ws.send(JSON.stringify({ type: 'chatMessage', data: wsMessage.message }));
+        }
         break;
       case 'playerMove':
         ws.send(
@@ -213,6 +271,10 @@ wss.on('connection', function connection(ws) {
             }
           )
         )
+        break
+      case "clearTimer":
+        clear()
+        console.log("Timer Cleared", seconds)
     }
 
     wss.clients.forEach(function each(client) {
@@ -227,8 +289,99 @@ wss.on('connection', function connection(ws) {
     //ws.send(data, {binary: isBinary});
   });
 
-ws.on('close', function close() {
+  ws.on('close', function close() {
     console.log('Bomberman client disconnected');
   });
 
+  //================== START ADDED on 30 March ======================
+
+  //~~~~~~~~~~~~~~Timer variables start~~~~~~~~~~~~
+  //Stop Watch from: https://codepen.io/madrine256/details/KKoRvBb
+  /*
+  let timeInterval = null,//time stamp at game start
+  timer = null,
+  timeStatus = false,
+  minutes = 0,
+  seconds = 0,
+  leadingMins = 0,
+  leadingSecs = 0;
+  */
+  //~~~~~~~~~~~~~~Timer variables end~~~~~~~~~~~~
+
+  //This is the timer function
+
+  function startTimer() {
+    seconds++;
+
+    //if seconds dived by 60 = 1 set back the seconds to 0 and increment the minutes 
+    if (seconds / 60 === 1) {
+      seconds = 0;
+      minutes++;
+    }
+    //add zero if seconds are less than 10
+    if (seconds < 10) {
+      leadingSecs = '0' + seconds.toString();
+    } else {
+      leadingSecs = seconds;
+    };
+    //add zero if minutes are less than 10
+    if (minutes < 10) {
+      leadingMins = '0' + minutes.toString();
+    } else {
+      leadingMins = minutes;
+    };
+
+    console.log("time", seconds);
+
+    //send leadingSecs to all clients
+
+    for (let [nickname, ws] of clients) {
+      console.log("nickname", nickname)
+      console.log("server sending leadingSecs:", leadingSecs);
+      ws.send(JSON.stringify({
+        type: 'seconds',
+        data: leadingSecs
+      }));
+    }
+    //console.log("leadingSecs", leadingSecs);
+
+    //Change timer text content to actaul stop watch
+    //timerContainer.innerHTML = `Count down: ${leadingMins} : ${leadingSecs}`;
+    //timerContainer.innerHTML = `Count down: ${leadingSecs}`;
+    // showLeadingSecs = `Count down: ${leadingSecs}`;
+    // console.log("LeadingSeconds",showLeadingSecs);
+
+    //load game when the countdown is finished
+
+    //not needed
+    /*
+    if (seconds === 10 ) {
+    let waitingPlayer = document.getElementById("waitForPlayers")
+    let game = document.getElementById("game")
+    clear()
+    waitingPlayer.style.display = "none"
+    game.style.display = "block"  
+    GameLoad()
+    }
+    */
+    //end of not needed
+  }
+
+  function clear() {
+    console.log(timer, timeInterval)
+    clearTimeout(timer)
+    clearInterval(timeInterval)
+  }
+
+
+
+
+  //================== END ADDED on 30 March ======================
+
 });
+
+//================== START ADDED on 30 March ======================
+
+
+
+//================== END ADDED on 30 March ======================
