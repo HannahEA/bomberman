@@ -52,13 +52,16 @@ export function WaitForPlayers(props) {
         // console.log("LeadingSeconds",showLeadingSecs);
         
         //load game when the countdown is finished
-        if (seconds === 3 ) {
+        if (seconds === 2 ) {
         let waitingPlayer = document.getElementById("waitForPlayers")
         let game = document.getElementById("game")
         clear()
         waitingPlayer.style.display = "none"
         game.style.display = "block"  
-        GameLoad()
+        let n = localStorage.getItem("numPlayers")
+        let p = localStorage.getItem("position")
+        console.log("position retrieved", p)
+        GameLoad(n, p)
     }
     }
     function clear() {

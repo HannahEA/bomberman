@@ -173,8 +173,29 @@ wss.on('connection', function connection(ws) {
         console.log('Bomberman client nickname:', wsMessage.nickname);
        clients.set(wsMessage.nickname, ws);
        for (let [nickname, ws] of clients) {
-        console.log(nickname, ws);
-        ws.send(JSON.stringify({ type:'clientsMap', data: Array.from(clients.keys()) }));
+        
+        if(nickname === wsMessage.nickname) {
+          ws.send(
+            JSON.stringify(
+              { 
+                type:'clientsMap', 
+                data: Array.from(clients.keys()), 
+                position: Array.from(clients.keys()).length-1  
+              }
+            )
+          )
+          console.log(nickname, Array.from(clients.keys()), Array.from(clients.keys()).length-1 )
+        } else {
+          ws.send(
+            JSON.stringify(
+              { 
+                type:'clientsMap', 
+                data: Array.from(clients.keys()) 
+              }
+            )
+          )
+        }
+        ;
        }
       //  ws.send(JSON.stringify({ type:'clientsMap', data: Array.from(clients.keys()) }  ;
         break;
@@ -182,6 +203,16 @@ wss.on('connection', function connection(ws) {
       case 'openMessage':
         console.log('Bomberman client open', wsMessage.data);
         break;
+      case 'playerMove':
+        ws.send(
+          JSON.stringify(
+            {
+              type: "playerMove",
+              player: wsMessage.player,
+              direction: wsMessage.direction
+            }
+          )
+        )
     }
 
     wss.clients.forEach(function each(client) {
