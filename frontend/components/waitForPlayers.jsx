@@ -55,15 +55,20 @@ export function WaitForPlayers(props) {
         //timerContainer.innerHTML = `Count down: ${leadingSecs}`;
         // showLeadingSecs = `Count down: ${leadingSecs}`;
         // console.log("LeadingSeconds",showLeadingSecs);
+        /*
         if (seconds === 20) {
             let waitingPlayer = document.getElementById("waitForPlayers")
             let game = document.getElementById("game")
-            clear()
+            
+            props.server.send(JSON.stringify({
+                type: 'clearTimer'            
+            }))  
+            
             waitingPlayer.style.display = "none"
             game.style.display = "block"
             GameLoad()
         }
-
+*/
     }
 
 
@@ -179,13 +184,17 @@ export function WaitForPlayers(props) {
 
                 leadSecs = msg.data;
                 console.log("lobby receives seconds:", leadSecs)
-                timerContainer.innerHTML = `Count down: ${leadSecs}`;
+                document.querySelector('#time').innerHTML = `Count down: ${leadSecs}`;
 
                 //load game when the countdown is finished
-                if (leadSecs === 20) {
+                if (leadSecs === '20') {
                     let waitingPlayer = document.getElementById("waitForPlayers")
                     let game = document.getElementById("game")
-                    clear()
+                    
+                    props.server.send(JSON.stringify({
+                        type: 'clearTimer'
+                    }))
+
                     waitingPlayer.style.display = "none"
                     game.style.display = "block"
                     GameLoad()

@@ -3,9 +3,10 @@ import { NickNames } from "./nickName";
 import { WaitForPlayers } from "./waitForPlayers.jsx";
 import { Game } from "./game.jsx";
 import { Chat } from "./chat.jsx";
-var http = require('http');
+import { GameLoad } from "./game.jsx";
+//var http = require('http');
 
-const apiURL = process.env.WEB_PILOT_APP_API_URL;
+//const apiURL = process.env.WEB_PILOT_APP_API_URL;
 
 
 
@@ -14,15 +15,15 @@ export function App() {
 
   const chat = document.getElementById('chat');
   const dataArray = []
-  const messageInput = document.getElementById('message');
-  const sendButton = document.getElementById('send');
+  //const messageInput = document.getElementById('message');
+  //const sendButton = document.getElementById('send');
 
   //Create WebSocket connection
   const socket = new WebSocket('ws://localhost:8080');
   var numPlayers = 0;
 
-  var timerContainer = document.querySelector('#time');
-  var countdown = document.getElementById('countdown');
+  //var timerContainer = document.querySelector('#time');
+  //var countdown = document.getElementById('countdown');
 
   socket.addEventListener("error", (event) => {
     console.log("Error from socket WS:", event);
@@ -60,7 +61,7 @@ export function App() {
           } else {
             console.log("App: no waitForPlayers")
           }
-          countdown.innerHTML = msg.data;
+          document.getElementById("countdown").innerHTML = msg.data;
         } else if (msg.data === 'Waiting for more players') {
           //show the timer
           if (document.querySelector(".waitForPlayers")) {
@@ -88,12 +89,27 @@ export function App() {
         break;
 
       case "seconds":
-        console.log("Seconds remaining: ", msg.data);
+        let leadSecs = msg.data;
+        console.log("Seconds remaining: ", leadSecs);
         //let timer = document.getElementById('timer');
-        if( document.getElementById("waitForPlayers")){
-          timerContainer.innerHTML = `Count down: ${msg.data}`;
+        if (document.getElementById("waitForPlayers")) {
+          //timerContainer.innerHTML = `Count down: ${msg.data}`;
+          document.querySelector('#time').innerHTML = `Count down: ${msg.data}`;
         }
-        
+        //load game when the countdown is finished
+        if (leadSecs === 10) {
+          let waitingPlayer = document.getElementById("waitForPlayers")
+          let game = document.getElementById("game")
+
+          socket.send(JSON.stringify({
+            type: 'clearTimer'
+          }));
+
+          waitingPlayer.style.display = "none"
+          game.style.display = "block"
+          GameLoad()
+        }
+
         break;
 
       case "chatMessage":
@@ -106,10 +122,11 @@ export function App() {
     const message = document.createElement('div');
 
     //turn chars into string, from event object: {"type":"Buffer","data":[72,101,108,108,111,32,83,101,114,118,101,114,33]}
-    if(event.target.data.data){
-      dataArray = event.target.data.data;
-    }
-   
+    if (msg.type === 'chatMessage') {
+      //dataArray = event.target.data.data;
+      dataArray = msg.data
+    
+
     console.log("event.data.data", dataArray)
     const stringData = String.fromCharCode(...dataArray);
 
@@ -117,7 +134,7 @@ export function App() {
     message.textContent = stringData;
     chat.appendChild(stringData);
     chat.scrollTop = chat.scrollHeight; // Scroll chat to bottom
-
+  }
   });
 
   const [nr, setNr] = Web_pilot.useState(0)

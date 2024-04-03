@@ -219,27 +219,38 @@ wss.on('connection', function connection(ws) {
           }, 100);
 
           //send leadingSecs to all clients
-
-          for (let [nickname, ws] of clients) {
-            console.log("nickname", nickname)
-            console.log("server sending leadingSecs:", leadingSecs);
-            ws.send(JSON.stringify({
-              type: 'seconds',
-              data: leadingSecs
-            }));
-          }
+          /*
+                    for (let [nickname, ws] of clients) {
+                      console.log("nickname", nickname)
+                      console.log("server sending leadingSecs:", leadingSecs);
+                      ws.send(JSON.stringify({
+                        type: 'seconds',
+                        data: leadingSecs
+                      }));
+                    }
+                    */
 
           //console.log("server sends seconds:", leadingSecs);
 
         }
 
         break;
+
+      case 'clearTimer':
+        console.log("timer cleared", leadingSecs);
+        clear();
+
+        break;
+
       //client message
       case 'chatMessage':
         console.log('Bomberman client chat', wsMessage.message);
         for (let [nickname, ws] of clients) {
           //console.log(nickname, ws);
-          ws.send(JSON.stringify({ type: 'chatMessage', data: wsMessage.message }));
+          ws.send(JSON.stringify({ 
+            type: 'chatMessage', 
+            data: wsMessage.message 
+          }));
         }
         break;
 
@@ -300,6 +311,16 @@ wss.on('connection', function connection(ws) {
     };
 
     console.log("time", seconds);
+
+    //send leadingSecs to all clients
+    for (let [nickname, ws] of clients) {
+      console.log("nickname", nickname)
+      console.log("server sending leadingSecs:", leadingSecs);
+      ws.send(JSON.stringify({
+        type: 'seconds',
+        data: leadingSecs
+      }));
+    }
     //console.log("leadingSecs", leadingSecs);
 
     //Change timer text content to actaul stop watch
