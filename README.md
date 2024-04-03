@@ -96,6 +96,21 @@ npm install --save-dev @babel/core @babel/preset-env @babel/preset-react
    ```js
    npm install --save ws
    ```
+
+### In the *backend* folder only, install the Node.js timers module
+   1. To install the Node.js timers module: 
+   ```js
+   npm install --save timers
+   ```
+   2. Inside the timers module, open the package.json file
+   and change the "scripts" field as shown below:
+   ``` js
+     "scripts": {
+    "test": "mocha test --reporter spec",
+    "test-cov": "mocha test --require blanket --reporter mocha-lcov-reporter | ./node_modules/coveralls/bin/coveralls.js"
+  }
+  ```
+   
 ### In the *frontend* folder only, install Parcel:
    1. To install the Parcel bundler in the *frontend* folder only: 
    ```js

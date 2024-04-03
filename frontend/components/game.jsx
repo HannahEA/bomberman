@@ -66,7 +66,7 @@ class TileMap {
             for (let column = 0; column < this.map[row].length; column++) {
                 const tile = this.map[row][column];
                 if (tile === 0  ) {
-                    console.log("Drawing grass tile at:", row, column);
+                    //console.log("Drawing grass tile at:", row, column);
                     // let pattern = ctx.createPattern(this.grass, "repeat")
                     // ctx.fillStyle = pattern
                     // ctx.fillRect(column * this.tileSize,

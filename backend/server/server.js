@@ -149,6 +149,8 @@ wss.on('connection', (ws) => {
 console.log('WebSocket server started on port 8080');
 */
 
+
+
 //Esteban test backend server that works in a separate file
 import { WebSocketServer } from 'ws';
 
@@ -158,12 +160,21 @@ const clients = new Map();
 
 
 wss.on('connection', function connection(ws) {
+
+  let timeInterval = null,//time stamp at game start
+    timer = null,
+    timeStatus = false,
+    minutes = 0,
+    seconds = 0,
+    leadingMins = 0,
+    leadingSecs = 0;
+
   ws.on('error', console.error);
 
-  ws.send(JSON.stringify('Welcome from server!'));
+  ws.send(JSON.stringify('Bomberman Hannah websocket is on'));
 
   ws.on('message', function message(data) {
-    console.log('received from client: %s', JSON.parse(data));
+    console.log('received: %s', JSON.parse(data));
 
     let wsMessage = JSON.parse(data);
 
@@ -174,63 +185,60 @@ wss.on('connection', function connection(ws) {
         break;
       //new client nickname
       case 'nickName':
-        if (clients.has(wsMessage.nickname && wsMessage.join === true)) {
-          ws.send(JSON.stringify({ type: 'nkNameChk', data: 'Nickname exists, try again' }));
-          return;
-        } else if (clients.size <= 4 && wsMessage.join === true) {
-          console.log('Bomberman client nickname:', wsMessage.nickname);
-          //add client to clients map
-          clients.set(wsMessage.nickname, ws);
-          //send welcome message to client
-          ws.send.JSON.stringify({ type: 'nkNameChk', data: 'Welcome Bomberman!' });
-          //send clients map to all clients
-          for (let [nickname, ws] of clients) {
-            console.log(nickname, ws);
-            ws.send(JSON.stringify({ type: 'clientsMap', data: Array.from(clients.keys()) }));
-          }
-          //send message to be displayed in waitForPlayers
-          if (clients.size === 1) { //countdown on hold if there is only 1 player
-            ws.send(JSON.stringify({ type: 'countdownMsg', data: 'You are first' }));
-
-          } else if (clients.size >= 2 && clients.size < 4) { //start 20 second countdown if there are 2-3 players
-            for (let [nickname, ws] of clients) {
-              console.log(nickname, ws);
-              ws.send(JSON.stringify({ type: 'countdownMsg', data: 'Waiting for more players' }));
-            }
-
-          } else if (clients.size === 4) { //start 10 second countdown if there are 4 players
-            for (let [nickname, ws] of clients) {
-              console.log(nickname, ws);
-              ws.send(JSON.stringify({ type: 'countdownMsg', data: 'Game starting in 10 seconds' }));
-            }
-          }
-        }
-        break;
-
-      //start 10 seconds count down after 20 seconds have passed
-      case 'countdownMsg':
-        console.log('countdownMsg:', wsMessage.data);
+        console.log('Bomberman client nickname:', wsMessage.nickname);
+        clients.set(wsMessage.nickname, ws);
+        //send the array of Bombermans to all clients
         for (let [nickname, ws] of clients) {
           console.log(nickname, ws);
-          ws.send(JSON.stringify({ type: 'countdownMsg', data: wsMessage.data }));
+          ws.send(JSON.stringify({
+            type: 'clientsMap',
+            data: Array.from(clients.keys())
+          }));
         }
-        break;
 
-      //game starts
-      case 'gameOn':
-        console.log('gameOn:', wsMessage.data);
-        for (let [nickname, ws] of clients) {
-          console.log("client: ", nickname, ws);
-          ws.send(JSON.stringify({ type: 'gameOn', data: wsMessage.data }));
+        //greeting for first Bomberman
+        if (clients.size === 1) {
+          //console.log("there is one client now!")
+          ws.send(JSON.stringify({
+            type: 'countdownMsg',
+            data: 'You are first'
+          }));
+          //Greeting for second Bomberman
+        } else if (clients.size === 2) {
+          //send greeting & start timer
+          for (let [nickname, ws] of clients) {
+            //console.log(nickname, ws);
+            ws.send(JSON.stringify({
+              type: 'countdownMsg',
+              data: 'Waiting for more players'
+            }));
+          }
+          timer = setTimeout(function () {
+            timeStatus = true;
+            timeInterval = setInterval(startTimer, 1000);
+          }, 100);
+
+          //send leadingSecs to all clients
+
+          for (let [nickname, ws] of clients) {
+            console.log("nickname", nickname)
+            console.log("server sending leadingSecs:", leadingSecs);
+            ws.send(JSON.stringify({
+              type: 'seconds',
+              data: leadingSecs
+            }));
+          }
+
+          //console.log("server sends seconds:", leadingSecs);
+
         }
+
         break;
-
-
       //client message
       case 'chatMessage':
         console.log('Bomberman client chat', wsMessage.message);
         for (let [nickname, ws] of clients) {
-          console.log(nickname, ws);
+          //console.log(nickname, ws);
           ws.send(JSON.stringify({ type: 'chatMessage', data: wsMessage.message }));
         }
         break;
@@ -253,4 +261,84 @@ wss.on('connection', function connection(ws) {
     console.log('Bomberman client disconnected');
   });
 
+  //================== START ADDED on 30 March ======================
+
+  //~~~~~~~~~~~~~~Timer variables start~~~~~~~~~~~~
+  //Stop Watch from: https://codepen.io/madrine256/details/KKoRvBb
+  /*
+  let timeInterval = null,//time stamp at game start
+  timer = null,
+  timeStatus = false,
+  minutes = 0,
+  seconds = 0,
+  leadingMins = 0,
+  leadingSecs = 0;
+  */
+  //~~~~~~~~~~~~~~Timer variables end~~~~~~~~~~~~
+
+  //This is the timer function
+
+  function startTimer() {
+    seconds++;
+
+    //if seconds dived by 60 = 1 set back the seconds to 0 and increment the minutes 
+    if (seconds / 60 === 1) {
+      seconds = 0;
+      minutes++;
+    }
+    //add zero if seconds are less than 10
+    if (seconds < 10) {
+      leadingSecs = '0' + seconds.toString();
+    } else {
+      leadingSecs = seconds;
+    };
+    //add zero if minutes are less than 10
+    if (minutes < 10) {
+      leadingMins = '0' + minutes.toString();
+    } else {
+      leadingMins = minutes;
+    };
+
+    console.log("time", seconds);
+    //console.log("leadingSecs", leadingSecs);
+
+    //Change timer text content to actaul stop watch
+    //timerContainer.innerHTML = `Count down: ${leadingMins} : ${leadingSecs}`;
+    //timerContainer.innerHTML = `Count down: ${leadingSecs}`;
+    // showLeadingSecs = `Count down: ${leadingSecs}`;
+    // console.log("LeadingSeconds",showLeadingSecs);
+
+    //load game when the countdown is finished
+
+    //not needed
+    /*
+    if (seconds === 10 ) {
+    let waitingPlayer = document.getElementById("waitForPlayers")
+    let game = document.getElementById("game")
+    clear()
+    waitingPlayer.style.display = "none"
+    game.style.display = "block"  
+    GameLoad()
+    }
+    */
+    //end of not needed
+  }
+
+  function clear() {
+    console.log(timer, timeInterval)
+    clearTimeout(timer)
+    clearInterval(timeInterval)
+  }
+
+
+
+
+  //================== END ADDED on 30 March ======================
+
 });
+
+//================== START ADDED on 30 March ======================
+
+
+
+//================== END ADDED on 30 March ======================

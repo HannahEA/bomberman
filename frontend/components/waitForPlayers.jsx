@@ -7,67 +7,193 @@ import WebSocket from 'ws';
 
 const apiURL = process.env.REACT_APP_API_URL;
 
-
 /** @jsx Web_pilot.createElement */
 export function WaitForPlayers(props) {
 
-    var countdown = document.getElementById('countdown');
+    //var countdown = document.getElementById('countdown');
+    //var time = document.getElementById("time");
+
+    //~~~~~~~~~~~~~~Timer variables start~~~~~~~~~~~~
+    //Stop Watch from: https://codepen.io/madrine256/details/KKoRvBb
     const timerContainer = document.querySelector('#time');//get timer element
+    let timeInterval = null,//time stamp at game start
+        timer = null,
+        timeStatus = false,
+        minutes = 0,
+        seconds = 0,
+        leadingMins = 0,
+        leadingSecs = 0,
+        leadSecs = "";
+    //~~~~~~~~~~~~~~Timer variables end~~~~~~~~~~~~
+
+    //This is the timer function
+
+    function startTimer() {
+        seconds++;
+
+        //if seconds dived by 60 = 1 set back the seconds to 0 and increment the minutes 
+        if (seconds / 60 === 1) {
+            seconds = 0;
+            minutes++;
+        }
+        //add zero if seconds are less than 10
+        if (seconds < 10) {
+            leadingSecs = '0' + seconds.toString();
+        } else {
+            leadingSecs = seconds;
+        };
+        //add zero if minutes are less than 10
+        if (minutes < 10) {
+            leadingMins = '0' + minutes.toString();
+        } else {
+            leadingMins = minutes;
+        };
+
+        console.log("time", seconds)
+        //Change timer text content to actaul stop watch
+        //timerContainer.innerHTML = `Count down: ${leadingMins} : ${leadingSecs}`;
+        //timerContainer.innerHTML = `Count down: ${leadingSecs}`;
+        // showLeadingSecs = `Count down: ${leadingSecs}`;
+        // console.log("LeadingSeconds",showLeadingSecs);
+        if (seconds === 20) {
+            let waitingPlayer = document.getElementById("waitForPlayers")
+            let game = document.getElementById("game")
+            clear()
+            waitingPlayer.style.display = "none"
+            game.style.display = "block"
+            GameLoad()
+        }
+
+    }
 
 
-    //possible values for waiting = 'waitForPlayers', 'wait20', 'wait10'
-    //if there is only 1 player, display greeting and the timer will not start
-    //get server greeting and players array
-    props.socket.addEventListener('message', function (event) {
-        var msg = JSON.parse(event.data)
+
+    function clear() {
+        console.log(timer, timeInterval)
+        clearTimeout(timer)
+        clearInterval(timeInterval)
+    }
+    /*   
+   if  (document.getElementById('waitForPlayers')) {
+           timer = setTimeout(function(){
+           timeStatus = true; 
+           timeInterval = setInterval(startTimer, 1000);
+         }, 200);
+       }
+     */
+    //wait 200 milliseconds before start timer
+
+
+
+
+    //using window.onload so the id='numPlay' will be rendered before js refers to it 
+    // window.onload = function() {
+    //     let opponents = document.querySelector("#numPlay");
+    //     opponents.innerHTML = `Number of Players:  ${props.nr}`;
+    // }
+
+    //=====> Start of bomberChat function <========
+    /*
+    //renders the chat and sends messages to all clients through ws
+    (function() {
+        const sendBtn = document.querySelector('#send');
+        const messages = document.querySelector('#messages');
+        const messageBox = document.querySelector('#messageBox');
+    
+        let ws;
+    
+        function showMessage(message) {
+          messages.textContent += `\n\n${message}`;
+          messages.scrollTop = messages.scrollHeight;
+          messageBox.value = '';
+        }
+    
+        function init() {
+          if (ws) {I feel so lucky!j
+            ws.onerror = ws.onopen = ws.onclose = null;
+            ws.close();
+          }
+    
+          ws = new WebSocket('ws://localhost:8082');
+          ws.onopen = () => {
+            console.log('Connection opened!');
+          }
+          ws.onmessage = ({ data }) => showMessage(data);
+          ws.onclose = function() {
+            ws = null;
+          }
+        }
+    
+        sendBtn.onclick = function() {
+          if (!ws) {
+            showMessage("No WebSocket connection :(");
+            return ;
+          }
+    
+          ws.send(messageBox.value);
+          showMessage(messageBox.value);
+        }
+    
+        init();
+      })();
+      */
+    //=====> End of bomberChat function <========
+
+    props.socket.addEventListener("message", (event) => {
+
+        var msg = JSON.parse(event.data);
+
+        //console.log("lobby receives message:", msg);
+        //countdown.innerHTML = `${msg}`
 
         switch (msg.type) {
-            case 'countdownMsg':
-                // console.log("msg.data and msg.type", msg.data, msg.type);
+
+            case "countdownMsg":
                 if (msg.data === 'You are first') {
                     //hide the timer
-                    document.getElementById('info').style.display = "none";
-                    //display message
-                    countdown.innerHTML = msg.data;
-                    return
-                } else if (msg.data === 'Waiting for more players' || msg.data === 'Game starting in 10 seconds') {
+                    if (document.getElementById("waitForPlayers")) {
+                        document.getElementById("time").style.display = "none";
+                        //display message
+                        document.getElementById("countdown").innerHTML = msg.data;
+                    } else {
+                        console.log("Lobby: no waitForPlayers")
+                    }
+                    //countdown.innerHTML = msg.data;
+
+                } else if (msg.data === 'Waiting for more players') {
                     //show the timer
-                    document.getElementById('info').style.display = "block";
-                    countdown.innerHTML = msg.data;
-                    return
-                } else if (msg.data === 'gameOn') {
-                    countdown.innerHTML = "";
+                    if (document.querySelector(".waitForPlayers")) {
+                        document.getElementById("time").style.display = "block";
+                        document.getElementById("countdown").innerHTML = msg.data;
+                    } else {
+                        console.log("Lobby: no waitForPlayers")
+                    }
+                    //display message
+                    //let countdown = document.getElementById('countdown');
+                    //countdown.innerHTML = msg.data;
+                }
+                break
+
+
+            case "seconds":
+
+                leadSecs = msg.data;
+                console.log("lobby receives seconds:", leadSecs)
+                timerContainer.innerHTML = `Count down: ${leadSecs}`;
+
+                //load game when the countdown is finished
+                if (leadSecs === 20) {
                     let waitingPlayer = document.getElementById("waitForPlayers")
                     let game = document.getElementById("game")
+                    clear()
                     waitingPlayer.style.display = "none"
                     game.style.display = "block"
                     GameLoad()
-                    return
                 }
-                break;
-
-            case 'clientsMap':
-                let y = msg.data.length;
-                props.numPlayers = y;
-                //update the number of players in the front-end
-                let numPlay = document.getElementById('numPlay');
-                if (props.numPlayers > 0 && props.numPlayers < 5) {
-                    numPlay.innerHTML = `Number of Players:  ${props.numPlayers}`;
-                    return;
-                } else {
-                    numPlay.innerHTML = 'Number of Players:  0';
-                }
-                break;
-
-            case 'seconds':
-                //let x = msg.data;
-                props.leadingSecs = msg.data;
-                //show seconds
-                timerContainer.innerHTML = `Count down: ${props.leadingSecs}`;
-                return
-
         }
     });
+
+
 
 
     return (
@@ -112,14 +238,15 @@ export function WaitForPlayers(props) {
                         <h3>'space bar' to shoot</h3>
                         <h3><strong>⇦ ⇨</strong> move left right</h3> */}
                     </div>
-                    <div className="countdown">
+                    <div id="countdown"></div>
+                    {/* <div className="bomberChat">
                         <span>
-                            {/* <h1>Bomberman Chat</h1>
+                        <h1>Bomberman Chat</h1>
                         <pre id="messages" style="height: 400px; overflow: scroll"></pre>
                         <input type="text" id="messageBox" placeholder="Type your message here" style="display: block; width: 100%; margin-bottom: 10px; padding: 10px;" />
-                        <button id="send" title="Send Message!" style="width: 100%; height: 30px;">Send Message</button> */}
+                        <button id="send" title="Send Message!" style="width: 100%; height: 30px;">Send Message</button>
                         </span>
-                    </div>
+                        </div> */}
                 </div>
             </center>
         </div>
