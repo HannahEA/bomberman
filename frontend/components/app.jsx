@@ -1,10 +1,9 @@
 import { Web_pilot } from "../../web_pilot/web_pilot";
 import { NickNames } from "./nickName";
 import { WaitForPlayers } from "./waitForPlayers.jsx";
-import { Game } from "./game.jsx";
-import { Chat } from "./chat.jsx";
-import { GameLoad } from "./game.jsx";
-//var http = require('http');
+import { Game, StartMove, StopMove, GameLoad} from "./game.jsx";
+import {Chat} from "./chat.jsx";
+var http = require('http');
 
 //const apiURL = process.env.WEB_PILOT_APP_API_URL;
 
@@ -45,7 +44,6 @@ export function App() {
     var msg = JSON.parse(event.data)
 
     switch (msg.type) {
-
       case "openMessage":
         console.log("event.data.data", msg.data);
         break;
@@ -86,28 +84,40 @@ export function App() {
         } else {
           numPlay.innerHTML = 'Number of Players:  0';
         }
+        
+          localStorage.setItem("numPlayers", numPlayers)
+          
+          console.log("what is my position?", msg.position)
+          if (msg.position != null) {
+            
+            localStorage.setItem("position", msg.position)
+          }
+        
         break;
 
       case "seconds":
         let leadSecs = msg.data;
         console.log("Seconds remaining: ", leadSecs);
         //let timer = document.getElementById('timer');
-        if (document.getElementById("waitForPlayers")) {
-          //timerContainer.innerHTML = `Count down: ${msg.data}`;
+        leadSecs = msg.data 
+        if( document.getElementById("waitForPlayers")){
           document.querySelector('#time').innerHTML = `Count down: ${msg.data}`;
         }
-        //load game when the countdown is finished
         if (leadSecs === 10) {
           let waitingPlayer = document.getElementById("waitForPlayers")
           let game = document.getElementById("game")
-
-          socket.send(JSON.stringify({
-            type: 'clearTimer'
-          }));
-
+          socket.send(
+            JSON.stringify(
+              {
+                type: "clearTimer"
+              }
+            )
+          )
           waitingPlayer.style.display = "none"
           game.style.display = "block"
-          GameLoad()
+          let n = localStorage.getItem("numPlayers")
+          let p = localStorage.getItem("position")
+          GameLoad(n, p)
         }
 
         break;
@@ -117,6 +127,7 @@ export function App() {
         message.textContent = msg.data;
         chat.appendChild(message);
         chat.scrollTop = chat.scrollHeight; // Scroll chat to bottom
+      break
     }
 
     const message = document.createElement('div');
@@ -137,9 +148,15 @@ export function App() {
   }
   });
 
+
   const [nr, setNr] = Web_pilot.useState(0)
   const [players, setPlayers] = Web_pilot.useState([]);
 
+  // add game movemnet eventlistener to movement
+  //onkeydown - start moving - clear Timeout
+  window.addEventListener("keydown", StartMove)
+  //onkeyup - stop moving - clear Timeout
+  window.addEventListener("keyup", StopMove)
 
   return (
     <div>
@@ -161,7 +178,9 @@ export function App() {
       <Chat
         socket={socket}
       />
-      <Game />
+      <Game 
+      numPlayers={numPlayers}
+      socket={socket}/>
     </div>
   )
 }

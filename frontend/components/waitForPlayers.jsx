@@ -3,6 +3,7 @@ import Explosion from "../static/explosion.gif"
 import AngelHeart from "../static/Angel_Heart.png"
 import { GameLoad } from "./game.jsx";
 
+
 import WebSocket from 'ws';
 
 const apiURL = process.env.REACT_APP_API_URL;
@@ -73,7 +74,7 @@ export function WaitForPlayers(props) {
 
 
 
-    function clear() {
+    /*function clear() {
         console.log(timer, timeInterval)
         clearTimeout(timer)
         clearInterval(timeInterval)
@@ -198,7 +199,9 @@ export function WaitForPlayers(props) {
 
                     waitingPlayer.style.display = "none"
                     game.style.display = "block"
-                    GameLoad()
+                    let n = localStorage.getItem("numPlayers")
+                    let p = localStorage.getItem("position")
+                    GameLoad(n, p)
                 }
                 */
         }
