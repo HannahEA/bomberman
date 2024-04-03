@@ -186,10 +186,38 @@ wss.on('connection', function connection(ws) {
       //new client nickname
       case 'nickName':
         console.log('Bomberman client nickname:', wsMessage.nickname);
+       clients.set(wsMessage.nickname, ws);
+       for (let [nickname, ws] of clients) {
+        ////MERGE 
+        if(nickname === wsMessage.nickname) {
+          ws.send(
+            JSON.stringify(
+              { 
+                type:'clientsMap', 
+                data: Array.from(clients.keys()), 
+                position: Array.from(clients.keys()).length-1  
+              }
+            )
+          )
+          console.log(nickname, Array.from(clients.keys()), Array.from(clients.keys()).length-1 )
+        } else {
+          ws.send(
+            JSON.stringify(
+              { 
+                type:'clientsMap', 
+                data: Array.from(clients.keys()) 
+              }
+            )
+          )
+        }
+        ;
+       }
+      //  ws.send(JSON.stringify({ type:'clientsMap', data: Array.from(clients.keys()) }  ;
+        
         clients.set(wsMessage.nickname, ws);
         //send the array of Bombermans to all clients
         for (let [nickname, ws] of clients) {
-          console.log(nickname, ws);
+          console.log(nickname);
           ws.send(JSON.stringify({
             type: 'clientsMap',
             data: Array.from(clients.keys())
@@ -218,16 +246,7 @@ wss.on('connection', function connection(ws) {
             timeInterval = setInterval(startTimer, 1000);
           }, 100);
 
-          //send leadingSecs to all clients
-
-          for (let [nickname, ws] of clients) {
-            console.log("nickname", nickname)
-            console.log("server sending leadingSecs:", leadingSecs);
-            ws.send(JSON.stringify({
-              type: 'seconds',
-              data: leadingSecs
-            }));
-          }
+          
 
           //console.log("server sends seconds:", leadingSecs);
 
@@ -242,7 +261,20 @@ wss.on('connection', function connection(ws) {
           ws.send(JSON.stringify({ type: 'chatMessage', data: wsMessage.message }));
         }
         break;
-
+      case 'playerMove':
+        ws.send(
+          JSON.stringify(
+            {
+              type: "playerMove",
+              player: wsMessage.player,
+              direction: wsMessage.direction
+            }
+          )
+        )
+        break
+      case "clearTimer":
+        clear()
+        console.log("Timer Cleared", seconds)
     }
 
     wss.clients.forEach(function each(client) {
@@ -300,6 +332,17 @@ wss.on('connection', function connection(ws) {
     };
 
     console.log("time", seconds);
+
+    //send leadingSecs to all clients
+
+    for (let [nickname, ws] of clients) {
+      console.log("nickname", nickname)
+      console.log("server sending leadingSecs:", leadingSecs);
+      ws.send(JSON.stringify({
+        type: 'seconds',
+        data: leadingSecs
+      }));
+    }
     //console.log("leadingSecs", leadingSecs);
 
     //Change timer text content to actaul stop watch

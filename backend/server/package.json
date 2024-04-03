@@ -5,8 +5,8 @@
   "description": "Bomberman back end",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node  server.js"
+    "test": "mocha test --reporter spec",
+    "test-cov": "mocha test --require blanket --reporter mocha-lcov-reporter | ./node_modules/coveralls/bin/coveralls.js"
   },
   "author": "Helena",
   "license": "ISC",

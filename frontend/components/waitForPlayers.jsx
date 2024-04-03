@@ -3,6 +3,7 @@ import Explosion from "../static/explosion.gif"
 import AngelHeart from "../static/Angel_Heart.png"
 import { GameLoad } from "./game.jsx";
 
+
 import WebSocket from 'ws';
 
 const apiURL = process.env.REACT_APP_API_URL;
@@ -55,20 +56,24 @@ export function WaitForPlayers(props) {
         //timerContainer.innerHTML = `Count down: ${leadingSecs}`;
         // showLeadingSecs = `Count down: ${leadingSecs}`;
         // console.log("LeadingSeconds",showLeadingSecs);
-        if (seconds === 20) {
-            let waitingPlayer = document.getElementById("waitForPlayers")
-            let game = document.getElementById("game")
-            clear()
-            waitingPlayer.style.display = "none"
-            game.style.display = "block"
-            GameLoad()
-        }
-
+        
+        //load game when the countdown is finished
+        if (seconds === 2 ) {
+        let waitingPlayer = document.getElementById("waitForPlayers")
+        let game = document.getElementById("game")
+        clear()
+        waitingPlayer.style.display = "none"
+        game.style.display = "block"  
+        let n = localStorage.getItem("numPlayers")
+        let p = localStorage.getItem("position")
+        console.log("position retrieved", p)
+        GameLoad(n, p)
+    }
     }
 
 
 
-    function clear() {
+    /*function clear() {
         console.log(timer, timeInterval)
         clearTimeout(timer)
         clearInterval(timeInterval)
@@ -179,16 +184,18 @@ export function WaitForPlayers(props) {
 
                 leadSecs = msg.data;
                 console.log("lobby receives seconds:", leadSecs)
-                timerContainer.innerHTML = `Count down: ${leadSecs}`;
+                document.querySelector('#time').innerHTML = `Count down: ${leadSecs}`;
 
                 //load game when the countdown is finished
                 if (leadSecs === 20) {
                     let waitingPlayer = document.getElementById("waitForPlayers")
                     let game = document.getElementById("game")
-                    clear()
+                   
                     waitingPlayer.style.display = "none"
                     game.style.display = "block"
-                    GameLoad()
+                    let n = localStorage.getItem("numPlayers")
+                    let p = localStorage.getItem("position")
+                    GameLoad(n, p)
                 }
         }
     });
