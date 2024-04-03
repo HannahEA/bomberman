@@ -187,6 +187,7 @@ export function WaitForPlayers(props) {
                 document.querySelector('#time').innerHTML = `Count down: ${leadSecs}`;
 
                 //load game when the countdown is finished
+                /*
                 if (leadSecs === '20') {
                     let waitingPlayer = document.getElementById("waitForPlayers")
                     let game = document.getElementById("game")
@@ -199,6 +200,7 @@ export function WaitForPlayers(props) {
                     game.style.display = "block"
                     GameLoad()
                 }
+                */
         }
     });
 
