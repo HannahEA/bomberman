@@ -1,11 +1,8 @@
 import { Web_pilot } from "../../web_pilot/web_pilot";
 import { NickNames } from "./nickName";
 import { WaitForPlayers } from "./waitForPlayers.jsx";
-import { Game, StartMove, StopMove, GameLoad} from "./game.jsx";
-import {Chat} from "./chat.jsx";
-var http = require('http');
-
-//const apiURL = process.env.WEB_PILOT_APP_API_URL;
+import { Game, StartMove, StopMove, GameLoad } from "./game.jsx";
+import { Chat } from "./chat.jsx";
 
 
 
@@ -14,138 +11,170 @@ export function App() {
 
   const chat = document.getElementById('chat');
   const dataArray = []
-  //const messageInput = document.getElementById('message');
-  //const sendButton = document.getElementById('send');
+  var leadSecs = 0;
 
-  //Create WebSocket connection
+  //=======================================================
+  //=============== Create WebSocket connection Start =====
+  //=======================================================
+
   const socket = new WebSocket('ws://localhost:8080');
+
+  //========================================================
+  //=============== Create WebSocket connection End  =======
+  //========================================================
+
+  var thePlayers = []
   var numPlayers = 0;
-
-  //var timerContainer = document.querySelector('#time');
-  //var countdown = document.getElementById('countdown');
-
-  socket.addEventListener("error", (event) => {
-    console.log("Error from socket WS:", event);
-  })
+  var timerMsg = "";
 
   // Connection opened
+  //signal to server that a new client has connected
   socket.addEventListener("open", (event) => {
-    let openMsg = "Hello Server! One more Bomberman is here!"
+    let openMsg = "Hello from Bombman client!"
     socket.send(JSON.stringify({
       type: "openMessage",
       data: openMsg
     }));
   });
 
+  socket.addEventListener("error", (event) => {
+    console.log("Error from Bombman client:", event);
+  })
+
   // Handle incoming messages
   socket.addEventListener('message', function (event) {
-    console.log("event inside message front end", event);
 
     var msg = JSON.parse(event.data)
 
     switch (msg.type) {
-      case "openMessage":
-        console.log("event.data.data", msg.data);
-        break;
-
 
       case "countdownMsg":
+        //assign value to timerMsg variable
+        timerMsg = msg.data;
+
         if (msg.data === 'You are first') {
+          //assign value to timerMsg variable
+          timerMsg = msg.data;
+
           //hide the timer
-          if (document.getElementById("waitForPlayers")) {
-            //document.getElementById("time").style.display = "none";
-            //display message
-            document.getElementById("countdown").innerHTML = msg.data;
-          } else {
-            console.log("App: no waitForPlayers")
-          }
+          document.getElementById("time").style.display = "none";
+          //display message
           document.getElementById("countdown").innerHTML = msg.data;
         } else if (msg.data === 'Waiting for more players') {
-          //show the timer
-          if (document.querySelector(".waitForPlayers")) {
-            document.getElementById("time").style.display = "block";
-            document.getElementById("countdown").innerHTML = msg.data;
-          } else {
-            console.log("App: no waitForPlayers")
-          }
-          //display message
-          //let countdown = document.getElementById('countdown');
+          //assign value to timerMsg variable
+          timerMsg = msg.data;
+          //display message, timer and number of players
+
           document.getElementById("time").style.display = "block";
           document.getElementById("countdown").innerHTML = msg.data;
+          document.getElementById("numPlay").innerHTML = `Number of Players:  ${numPlayers}`;
+
+
+        } else if (msg.data === 'Game starting in 10 seconds') {
+
+          //assign value to timerMsg variable
+          timerMsg = msg.data;
+
+          //display message
+          document.getElementById("countdown").innerHTML = msg.data;
+          document.getElementById("numPlay").innerHTML = `Number of Players:  ${numPlayers}`;
+
+
+        } else if (msg.data === 'gameOn') {
+          timerMsg = msg.data;
+
         }
+
         break
 
       case "clientsMap":
-        console.log("length of players array", msg.data.length);
         numPlayers = msg.data.length;
-        let numPlay = document.getElementById('numPlay');
-        if (numPlayers > 0) {
-          numPlay.innerHTML = `Number of Players:  ${numPlayers}`;
-        } else {
-          numPlay.innerHTML = 'Number of Players:  0';
-        }
-        
-          localStorage.setItem("numPlayers", numPlayers)
-          
-          console.log("what is my position?", msg.position)
-          if (msg.position != null) {
-            
-            localStorage.setItem("position", msg.position)
-          }
-        
-        break;
+        thePlayers = msg.data;
+        console.log("Inside App.js, the leadSecs ====>", leadSecs);
 
-      case "seconds":
-        let leadSecs = msg.data;
-        console.log("Seconds remaining: ", leadSecs);
-        //let timer = document.getElementById('timer');
-        leadSecs = msg.data 
-        if( document.getElementById("waitForPlayers")){
-          document.querySelector('#time').innerHTML = `Count down: ${msg.data}`;
+        //display number of players in front end
+        document.getElementById('numPlay').innerHTML = `Number of Players:  ${numPlayers}`;
+
+        //save number of players in local storage
+        localStorage.setItem("numPlayers", numPlayers)
+
+        if (msg.position != undefined) {
+
+          localStorage.setItem("position", msg.position)
         }
-        if (leadSecs === 10) {
+
+        if (numPlayers === 4 && leadSecs < 20 && timerMsg === 'Waiting for more players') {
+          //stop the timer
+          socket.send(JSON.stringify({
+            type: "clearTimer"
+          }))
+        }
+
+        break;
+      
+      case "seconds":
+
+        leadSecs = msg.data;
+        document.querySelector('#time').innerHTML = `Count down: ${leadSecs}`;
+
+        console.log("the timerMsg inside seconds case:", timerMsg)
+
+
+        if (leadSecs === 20 && timerMsg === 'Waiting for more players') {
+          //stop the timer
+          socket.send(JSON.stringify({
+            type: "clearTimer"
+          }))
+
+          //start 10 seconds countdown
+          socket.send(JSON.stringify({
+            type: 'wait10'
+          }))
+
+        } else if (leadSecs === 10 && timerMsg === 'Game starting in 10 seconds') {
           let waitingPlayer = document.getElementById("waitForPlayers")
           let game = document.getElementById("game")
-          socket.send(
-            JSON.stringify(
-              {
-                type: "clearTimer"
-              }
-            )
-          )
-          waitingPlayer.style.display = "none"
-          game.style.display = "block"
-          let n = localStorage.getItem("numPlayers")
-          let p = localStorage.getItem("position")
-          GameLoad(n, p)
+
+          //stop the timer
+          socket.send(JSON.stringify({
+            type: "clearTimer"
+          }))
+
+          gameStarts = setTimeout(() => {
+
+            //load the game
+            waitingPlayer.style.display = "none"
+            game.style.display = "block"
+            let n = localStorage.getItem("numPlayers")
+            let p = localStorage.getItem("position")
+            GameLoad(n, p)
+            clearTimeout(gameStarts);
+          }, 15);
         }
 
         break;
+
 
       case "chatMessage":
         const message = document.createElement('div');
         message.textContent = msg.data;
         chat.appendChild(message);
         chat.scrollTop = chat.scrollHeight; // Scroll chat to bottom
-      break
+
+        break
     }
 
     const message = document.createElement('div');
 
-    //turn chars into string, from event object: {"type":"Buffer","data":[72,101,108,108,111,32,83,101,114,118,101,114,33]}
     if (msg.type === 'chatMessage') {
-      //dataArray = event.target.data.data;
       dataArray = msg.data
-    
 
-    console.log("event.data.data", dataArray)
-    const stringData = String.fromCharCode(...dataArray);
+      const stringData = String.fromCharCode(...dataArray);
 
-    console.log(stringData);
-    message.textContent = stringData;
-    chat.appendChild(stringData);
-    chat.scrollTop = chat.scrollHeight; // Scroll chat to bottom
-  }
+      message.textContent = stringData;
+      chat.appendChild(stringData);
+      chat.scrollTop = chat.scrollHeight; // Scroll chat to bottom
+    }
   });
 
 
@@ -161,26 +190,22 @@ export function App() {
   return (
     <div>
       <NickNames
-        nr={nr}
-        setNr={setNr}
-        players={players}
-        setPlayers={setPlayers}
         socket={socket}
+        setNr={setNr}
+        setPlayers={setPlayers}
       />
       <WaitForPlayers
-        nr={nr}
-        setNr={setNr}
-        players={players}
-        setPlayers={setPlayers}
         socket={socket}
-        numPlayers={numPlayers}
+        thePlayers={thePlayers}
+        setNr={setNr}
+        setPlayers={setPlayers}
       />
       <Chat
         socket={socket}
       />
-      <Game 
-      numPlayers={numPlayers}
-      socket={socket}/>
+      <Game
+        numPlayers={numPlayers}
+        socket={socket} />
     </div>
   )
 }
