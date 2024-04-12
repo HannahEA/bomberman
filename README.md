@@ -87,12 +87,17 @@ npm install --save-dev @babel/core @babel/preset-env @babel/preset-react
 *https://www.npmjs.com/package/ws?activeTab=readme*
 
 ### In the root folder make one *Backend* and one *Frontend* folder.
-   In each *frontend* and *bakcend* folder type below VSC terminal commands:
+   In each *frontend* and *bakcend/server* folder type below VSC terminal commands:
    1. To create a node module:
    ```js
    npm init
    ```
-   2. To install the Node.js WebSocket library: 
+   2. To install Node modules type:
+   ```
+   npm install
+   ```
+
+   3. To install the Node.js WebSocket library: 
    ```js
    npm install --save ws
    ```

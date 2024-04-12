@@ -5,7 +5,7 @@ import { wall} from "../static/wall.jpeg"
 
 const url = "https://drive.google.com/drive/u/0/folders/1MN3N9JVBdpcHj7dPlnEbvff88hHnqZ0F"
 function image(fileName, tMap) {
-    console.log("filename", fileName)
+    //console.log("filename", fileName)
     const img = new Image()
     img.src= `${fileName}`
     img.onerror = (errorMsg) => {
@@ -16,7 +16,7 @@ function image(fileName, tMap) {
        
         img.onload = ()=> {
             tMap.imageLoaded = true
-            console.log("image has loaded", fileName)
+            //console.log("image has loaded", fileName)
      //}
     }
     
@@ -263,7 +263,7 @@ export function GameLoad(numPlayers, position) {
     let direction = ""
     export function StartMove(e) {
           
-          console.log("e.key", e.key)
+          //console.log("e.key", e.key)
           if (document.getElementById("game").style.display === "block") {
 
           if (e.key == "ArrowRight") {
@@ -386,7 +386,7 @@ export function GameLoad(numPlayers, position) {
 
 
 /** @jsx Web_pilot.createElement */
-export function Game() {
+export function Game(props) {
    
     
     return (
