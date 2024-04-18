@@ -1,4 +1,4 @@
-import { ctx, tileMap, drawPlayer } from "./game"
+import { ctx, tileMap, drawPlayer, players } from "./game"
 
 function drawExplosion(b) {
         
@@ -97,7 +97,19 @@ for (let i=0; i<4; i++) {
                     (n) => {
                         console.log("is there a player present?", n)
                         if (n>2 && n<7) {
+                            //check players number of lives
+                            //if >1: draw player and take away a life
+                            if (players[n-3].lives > 1) {
+                                players[n-3].lives--
+                                //heart exploding
+
+                            } else {
+                                //if 1: take away life and show game over
+                            }
+                            
+
                             drawPlayer(n-3)
+                        
                         }   
                     }
                 )

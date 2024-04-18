@@ -10,7 +10,7 @@ const tileSize = 32
 export const tileMap = new TileMap(tileSize)
  //variables
 export let ctx 
-let players = [] 
+export let players = [] 
 let bombs = []
 let plI = null
 let direction = ""
@@ -174,7 +174,7 @@ export function GameLoad(numPlayers, position) {
             }
             if (direction == " ") {
                 // create bomb at player position 
-                let b = new Bomb(p.cCol, p.cRow, p.cX, p.cY, time)
+                let b = new Bomb(p.cCol, p.cRow, p.cX, p.cY, time, plI)
                 bombs.push(b)
                 console.log("new bomb creates:", bombs)
                 drawGrass()
