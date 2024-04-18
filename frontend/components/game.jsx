@@ -28,12 +28,12 @@ export function GameLoad(numPlayers, position) {
         
         //initialise players
         let lPosition = [[1,1], [1,13], [13,1], [13,13]]
-        if (numPlayers> 4) {
-            numPlayers = 4
-        }
-        if (position> 3) {
-            position = 3
-        }
+        // if (numPlayers> 4) {
+        //     numPlayers = 4
+        // }
+        // if (position> 3) {
+        //     position = 3
+        // }
         for (let i = 0; i<numPlayers; i++) {
             const player = new Player(i, lPosition[i][0], lPosition[i][1])
             players.push(player)

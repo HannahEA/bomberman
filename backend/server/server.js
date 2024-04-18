@@ -1,166 +1,28 @@
-/* =====> Example from JS project #4: Social Network <======
-import React, { createContext, useContext, useEffect, useRef, useState } from "react";
 
-const WebSocketContext = createContext();
-
-const WebSocketProvider = ({ children }) => {
-  const [isWebSocketConnected, setWebSocketConnected] = useState(false);
-  
-
-  const websocketRef = useRef(null);
-
-  useEffect(() => {
-    console.log(websocketRef.current)
-    if (!websocketRef.current) {
-      websocketRef.current = new WebSocket("ws://localhost:8000/websocket");
-
-      websocketRef.current.onopen = (e) => {
-        console.log("WebSocket Connection Successfully Opened");
-        setWebSocketConnected(true);
-        websocketRef.current.send(
-          JSON.stringify({
-            type: "connect",
-            cookie: document.cookie,
-          })
-        );
-      };
-
-    //   websocketRef.current.onmessage = (e) => {
-    //     // Handle WebSocket messages here
-    //             let message = JSON.parse(e.data)
-    //       console.log(message)
-    //       allData.current.presences = message.presences.clients
-    //       console.log(allData.current.presences)
-    //   };
-
-      websocketRef.current.onclose = () => {
-        console.log("WebSocket connection ended");
-        setWebSocketConnected(false);
-        websocketRef.current = null; // Reset the ref to null
-      };
-    }
-  }, []);
-
-  return (
-    <WebSocketContext.Provider value={{ websocketRef, isWebSocketConnected}}>
-      {children}
-    </WebSocketContext.Provider>
-  );
-};
-
-export const useWebSocket = () => {
-  return useContext(WebSocketContext);
-};
-
-export default WebSocketProvider;
-*/
-
-//no from: https://www.youtube.com/watch?v=FduLSXEHLng
-//rather from: https://www.youtube.com/watch?v=RL_E56NPSN0
-//import { Server } from "ws";
-
-
-/*const apiURL = process.env.WEB_PILOT_APP_API_URL;
-
-import WebSocket from 'ws';
-
-const wss = new WebSocket('ws://localhost:8082');
-
-wss.on("error", function(err){
-  console.log("Error from frontend WS:", err);
-})
-
-wss.on("connection", ws => {
-  console.log("A Bomberman player has joined.");
-
-  ws.on('message', function incoming(data){
-    wss.clients.forEach(function each(client){
-      if(client!== ws && client.readyState === WebSocket.OPEN){
-        client.send(data);
-      }
-    })
-  })
-
-  ws.on("close", () =>{
-    console.log("A Bomberman player has left.");
-  });
-
-
-});
-*/
-
-//ChatGPT suggestion:
-/*import {WebSocketServer, WebSocket} from 'ws';
-
-const wss = new WebSocketServer({port:8080});
-
-wss.on("error", function(err){
-  console.log("Error from server WS:", err);
-})
-
-wss.on('connection', function connection(ws) {
-    console.log('New client connected', ws.readyState);
-
-    // ws.listen(8080, function () {
-    //   console.log('Listening on http://localhost:8080');
-    // });
-
-    ws.on('message', function incoming(message) {
-        console.log('Received: %s', message);
-        
-    // Broadcast received message to all clients
-      wss.clients.forEach(function each(client) {
-        if (client !== ws && client.readyState === WebSocket.OPEN) {
-            client.send(message);
-        }
-      });
-    });
-
-    ws.on('close', function () {
-        console.log('Client disconnected');
-    });
-});
-
-console.log('WebSocket server started on port 8080');
-*/
-
-//backend server prior to Esteban test
-/*
-import  WebsocketServer from 'ws';
-const wss = new WebsocketServer({ port: 8080 });
-
-wss.on('connection', (ws) => {
-  console.log('Client connected');
-
-  ws.on('message', (message) => {
-    console.log(`Received message: ${message}`);
-    wss.clients.forEach((client) => {
-      if (client !== ws && client.readyState === OPEN) {
-        client.send(message);
-      }
-    });
-  });
-
-  ws.on('close', () => {
-    console.log('Client disconnected');
-  });
-});
-
-console.log('WebSocket server started on port 8080');
-*/
-
-
-
-//Esteban test backend server that works in a separate file
 import { WebSocketServer } from 'ws';
 import { AddBricks } from './makeBoard.js';
+
+//========== New WebSocket Server ========================
+
 const wss = new WebSocketServer({ port: 8080 });
-//var clients = [];
-const clients = new Map();
+
+//========================================================
+
 const Layout = AddBricks()
 const map = JSON.stringify(AddBricks().flat())
+const clients = new Map();
+var waiting = '';
+
 
 wss.on('connection', function connection(ws) {
+
+
+
+  //========================================================
+  //========== START OF Timer Variables and Functions ======
+  //========================================================
+
+  //~~~~~~~~~~~~~~ START OF Timer variables ~~~~~~~~~~~~
 
   let timeInterval = null,//time stamp at game start
     timer = null,
@@ -170,170 +32,40 @@ wss.on('connection', function connection(ws) {
     leadingMins = 0,
     leadingSecs = 0;
 
-  ws.on('error', console.error);
+  //~~~~~~~~~~~~~~ END OF Timer variables ~~~~~~~~~~~~
 
-  //ws.send(JSON.stringify('Bomberman Hannah websocket is on'));
+  //~~~~~~~~~~~~~~ START OF Timer functions ~~~~~~~~~~~~
 
-  ws.on('message', function message(data) {
-    console.log('received: %s', JSON.parse(data));
+  function clear() {
+    console.log('clear has been called')
+    clearTimeout(timer)
+    clearInterval(timeInterval)
+  }
 
-    let wsMessage = JSON.parse(data);
+  //2 or 3 players have joined
+  function twentySecondsStart() {
+    console.log("twentySecondsStart has been called")
+    //wait 200 milliseconds before starting timer
+    timer = setTimeout(function () {
+      timeStatus = true;
+      timeInterval = setInterval(startTimer, 1000);
+    }, 10);
+  }
 
-    switch (wsMessage.type) {
+  // 10 seconds to start and no one else joins
+  function tenSecondsStart() {
+    console.log("tenSecondsStart has been called")
+    timer = setTimeout(function () {
+      timeStatus = true;
+      timeInterval = setInterval(startTimer, 1000);
+    }, 10);
+  }
 
-      case 'openMessage':
-        console.log('Bomberman client open', wsMessage.data);
-        break;
-      //new client nickname
-      case 'nickName':
-        console.log('Bomberman client nickname:', wsMessage.nickname);
-       clients.set(wsMessage.nickname, ws);
-       for (let [nickname, ws] of clients) {
-        ////MERGE 
-        if(nickname === wsMessage.nickname) {
-          ws.send(
-            JSON.stringify(
-              { 
-                type:'clientsMap', 
-                data: Array.from(clients.keys()), 
-                position: Array.from(clients.keys()).length-1  
-              }
-            )
-          )
-          console.log(nickname, Array.from(clients.keys()), Array.from(clients.keys()).length-1 )
-        } else {
-          ws.send(
-            JSON.stringify(
-              { 
-                type:'clientsMap', 
-                data: Array.from(clients.keys()) 
-              }
-            )
-          )
-        }
-        ;
-       }
-      //  ws.send(JSON.stringify({ type:'clientsMap', data: Array.from(clients.keys()) }  ;
-        
-        clients.set(wsMessage.nickname, ws);
-        //send the array of Bombermans to all clients
-        for (let [nickname, ws] of clients) {
-          console.log(nickname);
-          ws.send(JSON.stringify({
-            type: 'clientsMap',
-            data: Array.from(clients.keys())
-          }));
-        }
-
-        //greeting for first Bomberman
-        if (clients.size === 1) {
-          //console.log("there is one client now!")
-          ws.send(JSON.stringify({
-            type: 'countdownMsg',
-            data: 'You are first'
-          }));
-          //Greeting for second Bomberman
-        } else if (clients.size === 2) {
-          //send greeting & start timer
-          for (let [nickname, ws] of clients) {
-            //console.log(nickname, ws);
-            ws.send(JSON.stringify({
-              type: 'countdownMsg',
-              data: 'Waiting for more players'
-            }));
-          }
-          //create random brick layout 
-          
-            let m = JSON.stringify(Layout.flat())
-            console.log("flat array", m, map)
-            for (let [nickname, ws] of clients) {
-              ws.send(
-                JSON.stringify(
-                    {
-                        type: "board",
-                        map: map 
-                    }
-                )
-            )
-            }
-            
-          
-
-          //start 20 second timer
-          timer = setTimeout(function () {
-            timeStatus = true;
-            timeInterval = setInterval(startTimer, 1000);
-          }, 100);
-
-          //console.log("server sends seconds:", leadingSecs);
-
-        }
-
-        break;
-      //client message
-      case 'chatMessage':
-        console.log('Bomberman client chat', wsMessage.message);
-        for (let [nickname, ws] of clients) {
-          //console.log(nickname, ws);
-          ws.send(JSON.stringify({ type: 'chatMessage', data: wsMessage.message }));
-        }
-        break;
-      case 'playerMove':
-        console.log("ws says: player has moved")
-        for (let [_, ws] of clients) {
-          ws.send(
-          JSON.stringify(
-            {
-              type: "playerMove",
-              player: wsMessage.player,
-              direction: wsMessage.direction
-            }
-          )
-        )
-        }
-        
-        break
-      case "clearTimer":
-        clear()
-        console.log("Timer Cleared", seconds)
-        break
-      
-    }
-
-    wss.clients.forEach(function each(client) {
-      if (client !== ws && client.readyState === WebSocketServer.OPEN) {
-        client.send(data);
-      }
-    });
-    ws.send(JSON.stringify({
-      type: 'message',
-      data: data
-    }));
-    //ws.send(data, {binary: isBinary});
-  });
-
-  ws.on('close', function close() {
-    console.log('Bomberman client disconnected');
-  });
-
-  //================== START ADDED on 30 March ======================
-
-  //~~~~~~~~~~~~~~Timer variables start~~~~~~~~~~~~
   //Stop Watch from: https://codepen.io/madrine256/details/KKoRvBb
-  /*
-  let timeInterval = null,//time stamp at game start
-  timer = null,
-  timeStatus = false,
-  minutes = 0,
-  seconds = 0,
-  leadingMins = 0,
-  leadingSecs = 0;
-  */
-  //~~~~~~~~~~~~~~Timer variables end~~~~~~~~~~~~
-
   //This is the timer function
-
   function startTimer() {
+    console.log("startTimer has been called")
+
     seconds++;
 
     //if seconds dived by 60 = 1 set back the seconds to 0 and increment the minutes 
@@ -354,57 +86,293 @@ wss.on('connection', function connection(ws) {
       leadingMins = minutes;
     };
 
-    console.log("time", seconds);
-
     //send leadingSecs to all clients
-
     for (let [nickname, ws] of clients) {
-      console.log("nickname", nickname)
-      console.log("server sending leadingSecs:", leadingSecs);
       ws.send(JSON.stringify({
         type: 'seconds',
         data: leadingSecs
       }));
     }
-    //console.log("leadingSecs", leadingSecs);
 
-    //Change timer text content to actaul stop watch
-    //timerContainer.innerHTML = `Count down: ${leadingMins} : ${leadingSecs}`;
-    //timerContainer.innerHTML = `Count down: ${leadingSecs}`;
-    // showLeadingSecs = `Count down: ${leadingSecs}`;
-    // console.log("LeadingSeconds",showLeadingSecs);
+    if(leadingSecs === '20' && waiting === 'wait20'){
+      //assign the waiting variable 
+      waiting = 'wait10';
+      for (let [nickname, ws] of clients) {
+        //console.log(nickname);
+        ws.send(JSON.stringify({
+          type: 'countdownMsg',
+          data: 'Game starting in 10 seconds'
+        }));
+      }
+      //stop the timer
+      clear()
 
-    //load game when the countdown is finished
+    }else if(leadingSecs === '10' && waiting === 'wait10'){
+      //assign the waiting variable 
+      waiting = 'gameOn';
+      //send signal to start game
+      for (let [nickname, ws] of clients) {
+        //console.log(nickname);
+        ws.send(JSON.stringify({
+          type: 'countdownMsg',
+          data: 'gameOn'
+        }));
+      }
 
-    //not needed
-    /*
-    if (seconds === 10 ) {
-    let waitingPlayer = document.getElementById("waitForPlayers")
-    let game = document.getElementById("game")
-    clear()
-    waitingPlayer.style.display = "none"
-    game.style.display = "block"  
-    GameLoad()
+console.log("waiting inside startTimer:",waiting)
+
+      //stop the timer
+      clear()
     }
-    */
-    //end of not needed
   }
 
-  function clear() {
-    //console.log(timer, timeInterval)
-    clearTimeout(timer)
-    clearInterval(timeInterval)
-  }
+  //~~~~~~~~~~~~~~ END OF Timer functions ~~~~~~~~~~~~
+
+  //========================================================
+  //========== END OF Timer Variables and Functions ========
+  //========================================================
+
+  //Below applies to 'on connection' server event
+
+  ws.on('error', console.error);
+
+  //send greeting to new client only
+  ws.send(JSON.stringify({
+    type: 'welcome',
+    data: 'Greetings from server!'
+  }));
 
 
+  //=======================================================
+  //======= START OF WS Server Message handling ===========
+  //=======================================================
+
+  ws.on('message', function message(data) {
 
 
-  //================== END ADDED on 30 March ======================
+    let wsMessage = JSON.parse(data);
+
+    //~~~~~~~~~~~~~~ START OF Msg.Type Switch ~~~~~~~~~~~~~~~
+
+    switch (wsMessage.type) {
+
+      //send map when new client joins to new client only
+      case 'openMessage':
+        //send map to client when ws opens. Used inside nickName component
+
+          ws.send(JSON.stringify({
+            type: 'clientsMap',
+            data: Array.from(clients.keys())
+          }
+          ));
+
+        break;
+
+      //new client nickname
+      case 'nickName':
+        console.log('Nickname received by server:', wsMessage.nickname);
+        //check if nickname exists
+        if (clients.size < 4 && clients.has(wsMessage.nickname) && wsMessage.join === true) {
+
+          ws.send(JSON.stringify({
+            type: 'nkNameChk',
+            data: 'Nickname exists, try again'
+          }));
+          return;
+
+          //if nickname is new add client to clients map
+        } else if (clients.size < 4 && !clients.has(wsMessage.nickname) && wsMessage.join === true && (waiting === "" || waiting === 'wait20')) {
+
+          //add client to clients map
+          clients.set(wsMessage.nickname, ws);
+          //send message to be displayed in nickName component
+          ws.send(JSON.stringify({
+            type: 'nkNameChk',
+            data: 'Welcome Bomberman!'
+          }));
+          
+          //send array of clients and Bomberman position to all clients
+          for (let [nickname, ws] of clients) {
+            let clientsM = {
+              type: 'clientsMap',
+              data: Array.from(clients.keys()),
+            }
+            if (wsMessage.nickname === nickname ) clientsM.position = Array.from(clients.keys()).length - 1
+              ws.send(JSON.stringify(clientsM));
+
+              console.log("nickname, array, position %n", nickname, Array.from(clients.keys()), Array.from(clients.keys()).length - 1)
+              console.log("waiting value inside server.js:", waiting);
+
+          }
+          let m = JSON.stringify(Layout.flat())
+console.log("flat array", m, map)
+
+  ws.send(
+    JSON.stringify(
+        {
+            type: "board",
+            map: map 
+        }
+    )
+)
+
+
+          //greeting for first Bomberman
+          if (clients.size === 1) {
+            waiting = "";
+            ws.send(JSON.stringify({
+              type: 'countdownMsg',
+              data: 'You are first'
+            }));
+            //Greeting for second Bomberman & start timer
+          } else if (clients.size === 2) {
+            //assign the waiting variable 
+            waiting = 'wait20';
+            //send greeting to all clients & start timer
+            for (let [nickname, ws] of clients) {
+              ws.send(JSON.stringify({
+                type: 'countdownMsg',
+                data: 'Waiting for more players'
+              }));
+            }
+
+            twentySecondsStart();
+
+            //Third Bomberman joins within the 20 seconds window
+          } else if (clients.size === 3 && waiting === 'wait20') {
+            //assign the waiting variable 
+            waiting = 'wait20';
+
+            //fourth Bomber joins within the 20 seconds window
+            //no one can join afterwards and 10 seconds to start game
+          } else if (clients.size === 4 && waiting === 'wait20') {
+            console.log("server.js waiting value when 4 bombermen:", waiting)
+            //assign the waiting variable 
+            waiting = 'wait10';
+            for (let [nickname, ws] of clients) {
+              ws.send(JSON.stringify({
+                type: 'countdownMsg',
+                data: 'Game starting in 10 seconds'
+              }));
+            }
+
+            //stop the timer
+            clear();
+            //re-start the timer for 10 seconds
+            tenSecondsStart();
+
+          }
+
+        } //end of <4 players have joined
+
+        else if (clients.size > 4 || wsMessage.join === false || waiting === 'gameOn') {
+          //assign the waiting variable 
+          waiting = 'gameOn';
+          //send message to be displayed in *** nickName ***
+          ws.send(JSON.stringify({
+            type: 'nkNameChk',
+            data: "Game full. Try later"
+          }));
+
+          //for any other case:
+        } else {
+          //assign the waiting variable 
+          waiting = 'gameOn';
+          //send message to be displayed in *** nickName ***
+          ws.send(JSON.stringify({
+            type: 'nkNameChk',
+            data: "Game full. Try later"
+          }));
+        }
+
+
+        break;
+
+      case 'clearTimer':
+        console.log("timer cleared", leadingSecs);
+
+        clear();
+
+        break;
+
+
+      case 'wait10':
+        waiting = 'wait10'
+        console.log("start 10 seconds countdown");
+        for (let [nickname, ws] of clients) {
+          ws.send(JSON.stringify({
+            type: 'countdownMsg',
+            data: 'Game starting in 10 seconds'
+          }));
+        }
+
+        tenSecondsStart();
+
+        break;
+
+      case 'gameOn':
+        waiting = 'gameOn'
+
+        for (let [nickname, ws] of clients) {
+          ws.send(JSON.stringify({
+            type: 'countdownMsg',
+            data: 'Game On'
+          }));
+        }
+        break;
+
+
+      //client message
+      case 'chatMessage':
+        console.log('Bomberman client chat', wsMessage.message);
+        for (let [nickname, ws] of clients) {
+
+          ws.send(JSON.stringify({
+            type: 'chatMessage',
+            data: wsMessage.message
+          }));
+        }
+        break;
+
+      case 'playerMove':
+        for (let [_, ws] of clients) {
+          ws.send(
+          JSON.stringify(
+            {
+              type: "playerMove",
+              player: wsMessage.player,
+              direction: wsMessage.direction
+            }
+          )
+        )
+        }
+        
+        break
+    }
+
+    //~~~~~~~~~~~~~~ END OF Msg.Type Switch ~~~~~~~~~~~~~~~
+
+
+    wss.clients.forEach(function each(client) {
+
+      if (client !== ws && client.readyState === WebSocketServer.OPEN) {
+        client.send(data);
+      }
+    });
+    ws.send(JSON.stringify({
+      type: 'message',
+      data: data
+    }));
+
+  });
+
+  //=======================================================
+  //======= END OF WS Server Message handling ===========
+  //=======================================================
+
+  ws.on('close', function close() {
+    console.log('Bomberman client disconnected');
+  });
+
 
 });
-
-//================== START ADDED on 30 March ======================
-
-
-
-//================== END ADDED on 30 March ======================

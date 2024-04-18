@@ -1,190 +1,90 @@
 import { Web_pilot } from "../../web_pilot/web_pilot.jsx"
 import Explosion from "../static/explosion.gif"
 import AngelHeart from "../static/Angel_Heart.png"
-import { GameLoad } from "./game.jsx";
+import { Game, StartMove, StopMove, GameLoad } from "./game.jsx";
+import stageStart from "../static/sounds/02 Stage Start.ogg"
+import mainBGM from "../static/sounds/03 Main BGM.ogg"
 
+let isPlaying = true;
+var audio2 = new Audio(stageStart)
+var audio3 = new Audio(mainBGM);
 
-import WebSocket from 'ws';
-
-const apiURL = process.env.REACT_APP_API_URL;
 
 /** @jsx Web_pilot.createElement */
 export function WaitForPlayers(props) {
 
-    //var countdown = document.getElementById('countdown');
-    //var time = document.getElementById("time");
+    var thePlayers = []
+    var numPlayers = 0;
+    var timerMsg = "";
 
-    //~~~~~~~~~~~~~~Timer variables start~~~~~~~~~~~~
-    //Stop Watch from: https://codepen.io/madrine256/details/KKoRvBb
-    const timerContainer = document.querySelector('#time');//get timer element
-    let timeInterval = null,//time stamp at game start
-        timer = null,
-        timeStatus = false,
-        minutes = 0,
-        seconds = 0,
-        leadingMins = 0,
-        leadingSecs = 0,
-        leadSecs = "";
-    //~~~~~~~~~~~~~~Timer variables end~~~~~~~~~~~~
+    function stgStart() {
 
-    //This is the timer function
-
-    function startTimer() {
-        seconds++;
-
-        //if seconds dived by 60 = 1 set back the seconds to 0 and increment the minutes 
-        if (seconds / 60 === 1) {
-            seconds = 0;
-            minutes++;
-        }
-        //add zero if seconds are less than 10
-        if (seconds < 10) {
-            leadingSecs = '0' + seconds.toString();
+        if (isPlaying) {
+            audio3.currentTime = 0;
+            
+            audio3.play();
         } else {
-            leadingSecs = seconds;
-        };
-        //add zero if minutes are less than 10
-        if (minutes < 10) {
-            leadingMins = '0' + minutes.toString();
+            audio3.pause()
+        }
+    }
+
+    function countToTen() {
+
+        if (isPlaying) {
+            audio2.currentTime = 0;
+            audio2.play();
         } else {
-            leadingMins = minutes;
-        };
-
-        console.log("time", seconds)
-        //Change timer text content to actaul stop watch
-        //timerContainer.innerHTML = `Count down: ${leadingMins} : ${leadingSecs}`;
-        //timerContainer.innerHTML = `Count down: ${leadingSecs}`;
-        // showLeadingSecs = `Count down: ${leadingSecs}`;
-        // console.log("LeadingSeconds",showLeadingSecs);
-        
-        //load game when the countdown is finished
-        if (seconds === 2 ) {
-        let waitingPlayer = document.getElementById("waitForPlayers")
-        let game = document.getElementById("game")
-        clear()
-        waitingPlayer.style.display = "none"
-        game.style.display = "block"  
-        let n = localStorage.getItem("numPlayers")
-        let p = localStorage.getItem("position")
-        console.log("position retrieved", p)
-        GameLoad(n, p)
-    }
+            audio2.pause()
+        }
     }
 
-
-
-    /*function clear() {
-        console.log(timer, timeInterval)
-        clearTimeout(timer)
-        clearInterval(timeInterval)
-    }
-    /*   
-   if  (document.getElementById('waitForPlayers')) {
-           timer = setTimeout(function(){
-           timeStatus = true; 
-           timeInterval = setInterval(startTimer, 1000);
-         }, 200);
-       }
-     */
-    //wait 200 milliseconds before start timer
-
-
-
-
-    //using window.onload so the id='numPlay' will be rendered before js refers to it 
-    // window.onload = function() {
-    //     let opponents = document.querySelector("#numPlay");
-    //     opponents.innerHTML = `Number of Players:  ${props.nr}`;
-    // }
-
-    //=====> Start of bomberChat function <========
-    /*
-    //renders the chat and sends messages to all clients through ws
-    (function() {
-        const sendBtn = document.querySelector('#send');
-        const messages = document.querySelector('#messages');
-        const messageBox = document.querySelector('#messageBox');
-    
-        let ws;
-    
-        function showMessage(message) {
-          messages.textContent += `\n\n${message}`;
-          messages.scrollTop = messages.scrollHeight;
-          messageBox.value = '';
-        }
-    
-        function init() {
-          if (ws) {I feel so lucky!j
-            ws.onerror = ws.onopen = ws.onclose = null;
-            ws.close();
-          }
-    
-          ws = new WebSocket('ws://localhost:8082');
-          ws.onopen = () => {
-            console.log('Connection opened!');
-          }
-          ws.onmessage = ({ data }) => showMessage(data);
-          ws.onclose = function() {
-            ws = null;
-          }
-        }
-    
-        sendBtn.onclick = function() {
-          if (!ws) {
-            showMessage("No WebSocket connection :(");
-            return ;
-          }
-    
-          ws.send(messageBox.value);
-          showMessage(messageBox.value);
-        }
-    
-        init();
-      })();
-      */
-    //=====> End of bomberChat function <========
 
     props.socket.addEventListener("message", (event) => {
 
         var msg = JSON.parse(event.data);
 
-        //console.log("lobby receives message:", msg);
-        //countdown.innerHTML = `${msg}`
-
         switch (msg.type) {
 
-            case "countdownMsg":
-                if (msg.data === 'You are first') {
-                    //hide the timer
-                    if (document.getElementById("waitForPlayers")) {
-                        document.getElementById("time").style.display = "none";
-                        //display message
-                        document.getElementById("countdown").innerHTML = msg.data;
-                    } else {
-                        console.log("Lobby: no waitForPlayers")
-                    }
-                    //countdown.innerHTML = msg.data;
+            case "clientsMap":
+                //used to render the number of Bombermen in the lobby
+                console.log("Inside waitForPlayers, the length of players array", msg.data.length);
+                thePlayers = msg.data;
+                numPlayers = msg.data.length;
+                document.querySelector("#numPlay").innerHTML = `Number of Players:  ${numPlayers}`;
 
-                } else if (msg.data === 'Waiting for more players') {
-                    //show the timer
-                    if (document.querySelector(".waitForPlayers")) {
-                        document.getElementById("time").style.display = "block";
-                        document.getElementById("countdown").innerHTML = msg.data;
-                    } else {
-                        console.log("Lobby: no waitForPlayers")
-                    }
-                    //display message
-                    //let countdown = document.getElementById('countdown');
-                    //countdown.innerHTML = msg.data;
+                if (numPlayers >= 1) {
+
+                    stgStart()
                 }
+
+                break;
+
+            case "countdownMsg":
+                //assign value to timerMsg variable
+                timerMsg = msg.data;
+                //display message
+                document.getElementById("countdown").innerHTML = timerMsg;
+
+                if (timerMsg == "Game starting in 10 seconds") {
+                    countToTen()
+                }
+
                 break
 
+            case "seconds":
+                //used to render the countdown timer
+                leadSecs = msg.data;
+                console.log("lobby receives seconds:", leadSecs)
+                document.querySelector('#time').innerHTML = `Count down: ${leadSecs}`;
 
-            
+                // if (leadSecs >= 2) {
+
+                //     stgStart()
+                // }
+
+                break;
         }
     });
-
-
 
 
     return (

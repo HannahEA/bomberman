@@ -13,6 +13,7 @@
   "author": "Helena",
   "license": "ISC",
   "dependencies": {
+    "@parcel/transformer-raw": "^2.12.0",
     "ws": "^8.16.0"
   },
   "devDependencies": {

@@ -32,4 +32,3 @@ export function AddBricks() {
     return layout
 }
 
-
