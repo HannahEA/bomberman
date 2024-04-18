@@ -163,6 +163,8 @@ export class Player {
         this.bombs = 0
         this.flames = 0
         this.speed = 0
+        //lives
+        this.lives = 3
        
     }
 
@@ -182,7 +184,7 @@ export class Player {
 }
 
 export class Bomb {
-    constructor(col, row, x, y, start) {
+    constructor(col, row, x, y, start, playerI) {
         this.explosion = image("https://i.imgur.com/9W3XES3.png", this)
         this.imageLoaded = false
         // col and row in tilemap
@@ -198,6 +200,8 @@ export class Bomb {
         //the centre square co-ords
         this.eX = 162
         this.eY = 152
+        //player who dropped the bomb
+        this.playerI = playerI
     }
 }
 
