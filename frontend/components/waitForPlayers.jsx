@@ -2,6 +2,12 @@ import { Web_pilot } from "../../web_pilot/web_pilot.jsx"
 import Explosion from "../static/explosion.gif"
 import AngelHeart from "../static/Angel_Heart.png"
 import { Game, StartMove, StopMove, GameLoad } from "./game.jsx";
+import stageStart from "../static/sounds/02 Stage Start.ogg"
+import mainBGM from "../static/sounds/03 Main BGM.ogg"
+
+let isPlaying = true;
+var audio2 = new Audio(stageStart)
+var audio3 = new Audio(mainBGM);
 
 
 /** @jsx Web_pilot.createElement */
@@ -10,6 +16,27 @@ export function WaitForPlayers(props) {
     var thePlayers = []
     var numPlayers = 0;
     var timerMsg = "";
+
+    function stgStart() {
+
+        if (isPlaying) {
+            audio3.currentTime = 0;
+            
+            audio3.play();
+        } else {
+            audio3.pause()
+        }
+    }
+
+    function countToTen() {
+
+        if (isPlaying) {
+            audio2.currentTime = 0;
+            audio2.play();
+        } else {
+            audio2.pause()
+        }
+    }
 
 
     props.socket.addEventListener("message", (event) => {
@@ -25,6 +52,11 @@ export function WaitForPlayers(props) {
                 numPlayers = msg.data.length;
                 document.querySelector("#numPlay").innerHTML = `Number of Players:  ${numPlayers}`;
 
+                if (numPlayers >= 1) {
+
+                    stgStart()
+                }
+
                 break;
 
             case "countdownMsg":
@@ -32,6 +64,10 @@ export function WaitForPlayers(props) {
                 timerMsg = msg.data;
                 //display message
                 document.getElementById("countdown").innerHTML = timerMsg;
+
+                if (timerMsg == "Game starting in 10 seconds") {
+                    countToTen()
+                }
 
                 break
 
@@ -41,6 +77,10 @@ export function WaitForPlayers(props) {
                 console.log("lobby receives seconds:", leadSecs)
                 document.querySelector('#time').innerHTML = `Count down: ${leadSecs}`;
 
+                // if (leadSecs >= 2) {
+
+                //     stgStart()
+                // }
 
                 break;
         }
