@@ -55,6 +55,7 @@ wss.on('connection', function connection(ws) {
   // 10 seconds to start and no one else joins
   function tenSecondsStart() {
     console.log("tenSecondsStart has been called")
+    seconds= 0
     timer = setTimeout(function () {
       timeStatus = true;
       timeInterval = setInterval(startTimer, 1000);
@@ -198,23 +199,24 @@ console.log("waiting inside startTimer:",waiting)
               data: Array.from(clients.keys()),
             }
             if (wsMessage.nickname === nickname ) clientsM.position = Array.from(clients.keys()).length - 1
-              ws.send(JSON.stringify(clientsM));
+              
+            ws.send(JSON.stringify(clientsM));
 
               console.log("nickname, array, position %n", nickname, Array.from(clients.keys()), Array.from(clients.keys()).length - 1)
               console.log("waiting value inside server.js:", waiting);
 
           }
           let m = JSON.stringify(Layout.flat())
-console.log("flat array", m, map)
+          console.log("flat array", m, map)
 
-  ws.send(
-    JSON.stringify(
-        {
-            type: "board",
-            map: map 
-        }
-    )
-)
+          ws.send(
+            JSON.stringify(
+              {
+                type: "board",
+                map: map 
+              }
+            )
+          )
 
 
           //greeting for first Bomberman

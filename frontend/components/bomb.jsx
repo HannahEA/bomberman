@@ -1,4 +1,4 @@
-import { ctx, tileMap } from "./game"
+import { ctx, tileMap, drawPlayer } from "./game"
 
 function drawExplosion(b) {
         
@@ -102,6 +102,11 @@ for (let i=0; i<4; i++) {
                     }
                 )
         }
+        if (b.count === 0) {
+            i = 4 
+            spot.splice(0,1)
+        }
+       
     }
 }
     b.count--
