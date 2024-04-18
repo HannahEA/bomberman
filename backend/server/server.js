@@ -153,11 +153,12 @@ console.log('WebSocket server started on port 8080');
 
 //Esteban test backend server that works in a separate file
 import { WebSocketServer } from 'ws';
-
+import { AddBricks } from './makeBoard.js';
 const wss = new WebSocketServer({ port: 8080 });
 //var clients = [];
 const clients = new Map();
-
+const Layout = AddBricks()
+const map = JSON.stringify(AddBricks().flat())
 
 wss.on('connection', function connection(ws) {
 
@@ -171,7 +172,7 @@ wss.on('connection', function connection(ws) {
 
   ws.on('error', console.error);
 
-  ws.send(JSON.stringify('Bomberman Hannah websocket is on'));
+  //ws.send(JSON.stringify('Bomberman Hannah websocket is on'));
 
   ws.on('message', function message(data) {
     console.log('received: %s', JSON.parse(data));
@@ -241,12 +242,28 @@ wss.on('connection', function connection(ws) {
               data: 'Waiting for more players'
             }));
           }
+          //create random brick layout 
+          
+            let m = JSON.stringify(Layout.flat())
+            console.log("flat array", m, map)
+            for (let [nickname, ws] of clients) {
+              ws.send(
+                JSON.stringify(
+                    {
+                        type: "board",
+                        map: map 
+                    }
+                )
+            )
+            }
+            
+          
+
+          //start 20 second timer
           timer = setTimeout(function () {
             timeStatus = true;
             timeInterval = setInterval(startTimer, 1000);
           }, 100);
-
-          
 
           //console.log("server sends seconds:", leadingSecs);
 
@@ -262,7 +279,9 @@ wss.on('connection', function connection(ws) {
         }
         break;
       case 'playerMove':
-        ws.send(
+        console.log("ws says: player has moved")
+        for (let [_, ws] of clients) {
+          ws.send(
           JSON.stringify(
             {
               type: "playerMove",
@@ -271,10 +290,14 @@ wss.on('connection', function connection(ws) {
             }
           )
         )
+        }
+        
         break
       case "clearTimer":
         clear()
         console.log("Timer Cleared", seconds)
+        break
+      
     }
 
     wss.clients.forEach(function each(client) {
@@ -368,7 +391,7 @@ wss.on('connection', function connection(ws) {
   }
 
   function clear() {
-    console.log(timer, timeInterval)
+    //console.log(timer, timeInterval)
     clearTimeout(timer)
     clearInterval(timeInterval)
   }

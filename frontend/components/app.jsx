@@ -1,7 +1,7 @@
 import { Web_pilot } from "../../web_pilot/web_pilot";
 import { NickNames } from "./nickName";
 import { WaitForPlayers } from "./waitForPlayers.jsx";
-import { Game, StartMove, StopMove, GameLoad} from "./game.jsx";
+import { Game, StartMove, GameLoad} from "./game.jsx";
 import {Chat} from "./chat.jsx";
 var http = require('http');
 
@@ -39,7 +39,7 @@ export function App() {
 
   // Handle incoming messages
   socket.addEventListener('message', function (event) {
-    console.log("event inside message front end", event);
+    //console.log("event inside message front end", event);
 
     var msg = JSON.parse(event.data)
 
@@ -134,15 +134,15 @@ export function App() {
     //turn chars into string, from event object: {"type":"Buffer","data":[72,101,108,108,111,32,83,101,114,118,101,114,33]}
     if(msg.type === "chatMessage" && event.target.data.data !== undefined){
       dataArray = event.target.data.data;
+      console.log("event.data.data", dataArray)
+      const stringData = String.fromCharCode(...dataArray);
+  
+      console.log(stringData);
+      message.textContent = stringData;
+      chat.appendChild(stringData);
+      chat.scrollTop = chat.scrollHeight; // Scroll chat to bottom
     }
    
-    console.log("event.data.data", dataArray)
-    const stringData = String.fromCharCode(...dataArray);
-
-    console.log(stringData);
-    message.textContent = stringData;
-    chat.appendChild(stringData);
-    chat.scrollTop = chat.scrollHeight; // Scroll chat to bottom
 
   });
 
@@ -152,9 +152,9 @@ export function App() {
 
   // add game movemnet eventlistener to movement
   //onkeydown - start moving - clear Timeout
-  window.addEventListener("keydown", StartMove)
+  window.addEventListener("keydown", function(e){StartMove(socket, e)})
   //onkeyup - stop moving - clear Timeout
-  window.addEventListener("keyup", StopMove)
+  //window.addEventListener("keyup", StopMove)
 
   return (
     <div>

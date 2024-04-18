@@ -180,23 +180,7 @@ export function WaitForPlayers(props) {
                 break
 
 
-            case "seconds":
-
-                leadSecs = msg.data;
-                console.log("lobby receives seconds:", leadSecs)
-                document.querySelector('#time').innerHTML = `Count down: ${leadSecs}`;
-
-                //load game when the countdown is finished
-                if (leadSecs === 20) {
-                    let waitingPlayer = document.getElementById("waitForPlayers")
-                    let game = document.getElementById("game")
-                   
-                    waitingPlayer.style.display = "none"
-                    game.style.display = "block"
-                    let n = localStorage.getItem("numPlayers")
-                    let p = localStorage.getItem("position")
-                    GameLoad(n, p)
-                }
+            
         }
     });
 
