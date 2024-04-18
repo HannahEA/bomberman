@@ -1,7 +1,7 @@
 import { Web_pilot } from "../../web_pilot/web_pilot";
 import { NickNames } from "./nickName";
 import { WaitForPlayers } from "./waitForPlayers.jsx";
-import { Game, StartMove, StopMove, GameLoad } from "./game.jsx";
+import { Game, StartMove, GameLoad } from "./game.jsx";
 import { Chat } from "./chat.jsx";
 
 //Bomberman soundtracks in frontend/static/sounds are sourced from: 
@@ -99,7 +99,7 @@ export function App() {
         //save number of players in local storage
         localStorage.setItem("numPlayers", numPlayers)
 
-        if (msg.position != undefined) {
+        if (msg.position !== undefined) {
 
           localStorage.setItem("position", msg.position)
         }
@@ -184,9 +184,9 @@ export function App() {
 
   // add game movemnet eventlistener to movement
   //onkeydown - start moving - clear Timeout
-  window.addEventListener("keydown", StartMove)
+  window.addEventListener("keydown", function(e){StartMove(socket, e)})
   //onkeyup - stop moving - clear Timeout
-  window.addEventListener("keyup", StopMove)
+  //window.addEventListener("keyup", StopMove)
 
   return (
     <div>
