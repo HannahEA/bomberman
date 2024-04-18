@@ -102,7 +102,7 @@ npm install --save-dev @babel/core @babel/preset-env @babel/preset-react
    npm install --save ws
    ```
 
-### In the *backend* folder only, install the Node.js timers module
+### In the *backend/server* folder only, install the Node.js timers module
    1. To install the Node.js timers module: 
    ```js
    npm install --save timers
@@ -142,6 +142,46 @@ npm install --save-dev @babel/core @babel/preset-env @babel/preset-react
        "build": "parcel build --dist-dir public"
       },
       ```
+
+### To ensure that Parcel can handle the *.ogg* sound files:
+
+Add a transformer for `.ogg` files. You can use the `@parcel/transformer-raw` package to import the file as a string.
+
+1. Install the transformer package by running the following command in VSC terminal:
+
+```bash
+npm install @parcel/transformer-raw
+```
+
+2. Then, either:
+
+Add a new transformer for `.ogg` files in your Parcel configuration file 
+(`index.json` under the `node_modules/@parcel/config-default` directory). 
+The configuration should look something like this:
+
+```json
+{
+  "transformers": {
+    "*.ogg": ["@parcel/transformer-raw"],
+    // ...rest of your transformers
+  }
+}
+```
+
+or, even better, create a `.parcelrc` file in the *frontend* folder and override the configuration there. 
+Here's how the `.parcelrc` file should look:
+
+```json
+{
+  "extends": "@parcel/config-default",
+  "transformers": {
+    "*.ogg": ["@parcel/transformer-raw"]
+  }
+}
+```
+
+
+
 
 ## How to link the front-end React server to the back-end GO server 
 ## *(Not relevant here but useful to know)*

@@ -1,13 +1,46 @@
 
 import { Web_pilot } from "../../web_pilot/web_pilot.jsx"
 import Professor_Buggler from "../static/Professor_Buggler.png"
+import titleScreen from "../static/sounds/01 Title Screen.ogg"
 
 var nameChk = "";
 var countdown = "";
-var leadingSeconds =0
+var leadingSeconds = 0
+var nickName = document.querySelector("#nickName");
+let isPlaying = true;
+
+//===============> Start Sound files variables <================
+
+//These are all the audio files used in the game
+var audio1 = new Audio(titleScreen);
+var stageStart = new Audio("../static/sounds/02 Stage Start.mp3");
+var mainBGM = new Audio("../static/sounds/03 Main BGM.mp3");
+var powerUpGet = new Audio("../static/sounds/04 Power-Up Get.mp3");
+var stageClear = new Audio("../static/sounds/05 Stage Clear.mp3");
+var bonusStage = new Audio("../static/sounds/06 Bonus Stage.mp3");
+var specialPowerUpGet = new Audio("../static/sounds/07 Special Power-Up Get.mp3");
+var ending = new Audio("../static/sounds/08 Ending.mp3");
+var miss = new Audio("../static/sounds/09 Miss.mp3");
+var gameOver = new Audio("../static/sounds/10 Game Over.mp3");
+
+//=================> End Sound files variables <================
 
 /** @jsx Web_pilot.createElement */
 export function NickNames(props) {
+
+    titleScr();
+
+
+    //play 'titleScreen' when user clicks on the input field
+    function titleScr() {
+
+        if (isPlaying) {
+            audio1.currentTime = 0;
+            audio1.play();
+        } else {
+            audio1.pause()
+        }
+    }
 
 
 
@@ -46,6 +79,9 @@ export function NickNames(props) {
                         document.getElementById('chat').style.display = 'block';
                         document.getElementById('message').style.display = 'block';
                         document.getElementById('send').style.display = 'block';
+                        //end title soundtrack
+                        isPlaying = false;
+                        titleScr()
                         //background color: #1f3956
                         //clear the timeout
                         clearTimeout(added);
@@ -58,7 +94,7 @@ export function NickNames(props) {
 
                         //clear the input field after 0.015 second
                         added = setTimeout(() => {
-                          
+
                             document.getElementById("nickNm").value = "";
                             document.getElementById("message1").innerHTML = "choose another name";
                             clearTimeout(added);
@@ -88,11 +124,13 @@ export function NickNames(props) {
 
             case "seconds":
 
-            leadingSeconds = msg.data;
+                leadingSeconds = msg.data;
 
 
         }// end of switch
     })
+
+
 
     //to collect new player's nickname
     function GrabNkNm(e) {
@@ -100,7 +138,11 @@ export function NickNames(props) {
         console.log("leadingSeconds inside GrabNkNm:", leadingSeconds)
         console.log("countdownMsg inside GrabNkNm:", countdown);
 
+        //titleScr();
+
         if (e.key === 'Enter' && e.target.value !== "") {
+
+
 
             //if there are less than 4 players
             if (len < 4 && countdown !== 'Game starting in 10 seconds' && countdown !== 'gameOn') {
@@ -153,7 +195,7 @@ export function NickNames(props) {
             </section>
             <div className="box" >
                 <label id="message1">Type your name</label>
-                <span><input type="text" id="nickNm" name="nickNm" onKeyUp={(e) => (GrabNkNm(e))} /></span>
+                <span><input type="text" id="nickNm" name="nickNm" onClick={() => titleScr()} onKeyUp={(e) => (GrabNkNm(e))} /></span>
             </div>
         </div>
     )
