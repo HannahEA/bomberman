@@ -51,6 +51,7 @@ wss.on('connection', function connection(ws) {
 
   // 10 seconds to start and no one else joins
   function tenSecondsStart() {
+    seconds = 0
     console.log("tenSecondsStart has been called")
     timer = setTimeout(function () {
       timeStatus = true;
