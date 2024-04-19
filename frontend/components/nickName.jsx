@@ -16,6 +16,7 @@ var audio1 = new Audio(titleScreen);
 var stageStart = new Audio("../static/sounds/02 Stage Start.mp3");
 var mainBGM = new Audio("../static/sounds/03 Main BGM.mp3");
 var powerUpGet = new Audio("../static/sounds/04 Power-Up Get.mp3");
+var deadAngel = new Audio("../static/sounds/deadAngel.ogg");
 var stageClear = new Audio("../static/sounds/05 Stage Clear.mp3");
 var bonusStage = new Audio("../static/sounds/06 Bonus Stage.mp3");
 var specialPowerUpGet = new Audio("../static/sounds/07 Special Power-Up Get.mp3");

@@ -133,7 +133,8 @@ export function App() {
           }))
 
         } else if (leadSecs === 10 && timerMsg === 'Game starting in 10 seconds') {
-          let waitingPlayer = document.getElementById("waitForPlayers")
+          //let waitingPlayer = document.getElementById("waitForPlayers")
+          let waitingPlayer = document.querySelector(".game-container");
           let game = document.getElementById("game")
 
           //stop the timer

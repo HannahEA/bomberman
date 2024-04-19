@@ -16,7 +16,7 @@ let plI = null
 let direction = ""
 ////self - which player are you? websocket need to log what position you are in the 4 players 
 ////make it a global variable
-let self 
+export  var self 
 
 //--------------CREATE THE GAME BOARD------------------------------
 
