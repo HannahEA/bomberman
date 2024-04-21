@@ -1,14 +1,17 @@
 import { ctx, tileMap, drawPlayer, players } from "./game"
 import { self } from "./game";
 import deadAngel from "../static/sounds/deadAngel.ogg"
-//import {whoAmI} from "./waitForPlayers"
+import gameOver from "../static/sounds/10 Game Over.ogg"
+import {whoAmI} from "./waitForPlayers"
+
 
 //=======> Start Heart and Explosion variables and functions <=======
-//var isPlaying = false;
+var isPlaying = true;
 var tries = 0;
 var lostHeart;
 var explosion;
 var audio4 = new Audio(deadAngel);
+var audio5 = new Audio(gameOver);
 
 //sets off explosion once after loss of one life, and plays 'deadAngel'
 function puff(t) {
@@ -19,6 +22,16 @@ function puff(t) {
     setTimeout(() => {
         explosion.style.opacity = "0"
     }, 500);
+}
+
+function gameEnd() {
+
+    if (isPlaying) {
+        audio5.currentTime = 0;
+        audio5.play();
+    } else {
+        audio5.pause()
+    }
 }
 
 //=======> End Heart and Explosion variables and functions <=======
@@ -153,8 +166,8 @@ function undrawExplosion(b) {
                                     puff(tries);
                                     //display end of game message
                                     document.querySelector("#whoAmI").innerHTML = '<p> GAME OVER<br>'
-                                        + `Better luck next time ${whoAmI}</p>`
-                                        ;
+                                        + `Better luck next time ${whoAmI}</p>`;
+                                        gameEnd()
                                 }
 
                             }
