@@ -24,7 +24,16 @@ export function AddBricks() {
                 let isBrick= Math.round(Math.random() * 1)
                 if ((2<row && row<12 || 2<column && column<12 ) && isBrick === 0) {
                     //update tileLayout.Layout layout to say this tile form grass(0) to brick(2)
-                    layout[row][column][0] = 2   
+                    layout[row][column][0] = 2 
+                    
+                    let isPower = Math.round(Math.random() * 6)
+                    if (isPower === 1){
+                        layout[row][column].push(8) 
+                    } else if (isPower === 2) {
+                        layout[row][column].push(9)
+                    } else if (isPower === 3) {
+                        layout[row][column].push(10)
+                    }
                 }
             }
         }

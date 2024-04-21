@@ -10,7 +10,7 @@ const tileSize = 32
 export const tileMap = new TileMap(tileSize)
  //variables
 export let ctx 
-export let players = [] 
+export var players = [] 
 let bombs = []
 let plI = null
 let direction = ""
@@ -150,17 +150,22 @@ export function GameLoad(numPlayers, position) {
                     unBomb(b,time)
                 } 
             } )
+            bombs.forEach((b) =>  {b.status === "complete"? tileMap.map[b.row][b.col].splice(0, 1): null})
             bombs = bombs.filter((b)=> b.status != "complete")
+
         }
-        
+        //if plI (index of a currently moving player) is not null 
         if (plI != null) {
-            
+            //get player object
             let p = players[plI]
+            //get array of players current position in the tilemap
             let pArr = tileMap.map[p.cRow][p.cCol]
+            //players index in the array of their current posiion
             let i = pArr.indexOf(plI+3)
             console.log("game loop variables: player \nindex:", plI, "\ntilemap Array:", pArr, "\nplayer index in array:", i)
+            
+            //check the array of players current position and draws all the relevant images
             function draw() {
-                console.log("drawing function: what is the value of pArr", pArr)
                 drawGrass()
                 pArr.forEach((n) => {  
                     console.log("drawing tile:", n)
@@ -168,25 +173,29 @@ export function GameLoad(numPlayers, position) {
                     console.log("drawing player")
                     drawPlayer(n-3)
                 } else if (n == 7) {
+                    console.log("drawing bomb")
                     drawBomb()
                 }
                 })
             }
+
+            //check cdirection the player is moving
             if (direction == " ") {
                 // create bomb at player position 
+                // for ( let i=0; i<players[plI].bombs; i++) {
+                // }
                 let b = new Bomb(p.cCol, p.cRow, p.cX, p.cY, time, plI)
                 bombs.push(b)
-                console.log("new bomb creates:", bombs)
+                console.log("new bomb created:", bombs)
                 drawGrass()
                 drawBomb()
                 drawPlayer(plI)
-                tileMap.map[p.cRow][p.cCol].splice(i, 0, 7)
+                tileMap.map[p.cRow][p.cCol].splice(0, 0, 7)
+                //players[plI].bombs = 0 
                 //window.requestAnimationFrame(() => {startBomb(b)})
                 //cX position can not be greater than the x position of the last grass tile
             } else if (direction == "ArrowRight" && !tileMap.map[p.cRow][p.cCol+1].includes(1) &&  !tileMap.map[p.cRow][p.cCol+1].includes(2)) { 
                 //p.cX<255 
-               
-
                 // remove player from old position - redraw the previous tile at the old position of the player
                 tileMap.map[p.cRow][p.cCol].splice(i, 1) 
                 console.log("moving right", direction, "array after splice:", tileMap.map[p.cRow][p.cCol])
@@ -244,8 +253,26 @@ export function GameLoad(numPlayers, position) {
                     //update current position in the tilemap
                     tileMap.map[p.cRow][p.cCol].push(p.index+3)
                 }
-    
+
+                //give power ups to player if there are any present
+                //check if the positin the player has moved into contains a power up
+                if (pArr.includes(8) ){
+                    //add to power up count
+                    p.bombs++
+                    console.log("player", plI, "has gained a power up. Bombs no.", p.bombs)
+                    pArr.splice(0,1)
+                } else if (pArr.includes(9)) {
+                    p.flames++
+                    console.log("player", plI, "has gained a power up. Flames no.", p.flames)
+                    pArr.splice(0,1)
+                } else if (pArr.includes(10)) {
+                    p.speed++
+                    console.log("player", plI, "has gained a power up. Speed no.", p.speed)
+                    pArr.splice(0,1)
+                }
+                //set index of the currently moving player to null as they have finished moving
               plI = null 
+              //set direction back to an empty string
               direction = ""
             
         }
@@ -273,8 +300,8 @@ export function GameLoad(numPlayers, position) {
             players[plI].bomb,
             0,
             0,
-            779,
-            779,
+            255,
+            197,
             players[plI].cX,
             players[plI].cY,
             20,
