@@ -1,4 +1,4 @@
-import { Web_pilot } from "../Webpilot/web_pilot.jsx"; 
+import { Web_pilot } from "../../web_pilot/web_pilot.jsx"; 
 import { progBomb, unBomb } from "./bomb.jsx";
 import { Player,TileMap, Bomb } from "./class.jsx";
 
@@ -16,7 +16,7 @@ let plI = null
 let direction = ""
 ////self - which player are you? websocket need to log what position you are in the 4 players 
 ////make it a global variable
-let self 
+export  var self 
 
 //--------------CREATE THE GAME BOARD------------------------------
 

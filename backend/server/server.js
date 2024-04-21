@@ -54,6 +54,7 @@ wss.on('connection', function connection(ws) {
 
   // 10 seconds to start and no one else joins
   function tenSecondsStart() {
+    seconds = 0
     console.log("tenSecondsStart has been called")
     seconds= 0
     timer = setTimeout(function () {
@@ -198,7 +199,10 @@ console.log("waiting inside startTimer:",waiting)
               type: 'clientsMap',
               data: Array.from(clients.keys()),
             }
-            if (wsMessage.nickname === nickname ) clientsM.position = Array.from(clients.keys()).length - 1
+            if (wsMessage.nickname === nickname ) {
+              clientsM.position = Array.from(clients.keys()).length - 1,
+              clientsM.whoAmI = wsMessage.nickname
+            }
               
             ws.send(JSON.stringify(clientsM));
 
