@@ -36,7 +36,9 @@ export class TileMap {
     // 5 - player3
     // 6 - player4
     // 7 - bomb 
-    // 8 - explosion
+    // 8 - bombs power up
+    // 9 - flames power up
+    //10 - speed power up
     map = [
         [[1], [1], [1], [1], [1], [1], [1], [1], [1], [1], [1], [1], [1], [1], [1]],
         [[1], [3], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [0], [4], [1]], 
@@ -168,6 +170,7 @@ export class Player {
        
     }
 
+
     initPlayer(ctx) {
             ctx.drawImage(
                 this.img,
@@ -186,6 +189,7 @@ export class Player {
 export class Bomb {
     constructor(col, row, x, y, start, playerI) {
         this.explosion = image("https://i.imgur.com/9W3XES3.png", this)
+        this.powerUp = image("https://steamuserimages-a.akamaihd.net/ugc/155778818325179682/F39A6F738F27210DB66DB8DC012CC2CD0AEB831E/?imw=5000&imh=5000&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false", this)
         this.imageLoaded = false
         // col and row in tilemap
         this.col = col 
@@ -202,6 +206,12 @@ export class Bomb {
         this.eY = 152
         //player who dropped the bomb
         this.playerI = playerI
+        //powerup image x y co-ords
+        this.flames = 125
+        this.bombs = 250
+        this.speed = 375
     }
+
+    
 }
 

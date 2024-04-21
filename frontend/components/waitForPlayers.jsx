@@ -10,7 +10,7 @@ var audio2 = new Audio(stageStart);
 var audio3 = new Audio(mainBGM);
 var idx;
 var thePlayArray;
-var whoAmI;
+export var whoAmI;
 
 /** @jsx Web_pilot.createElement */
 export function WaitForPlayers(props) {
