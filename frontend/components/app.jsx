@@ -11,7 +11,7 @@ import { Chat } from "./chat.jsx";
 export function App() {
 
   const chat = document.getElementById('chat');
-  const dataArray = []
+  var dataArray = []
   var leadSecs = 0;
 
   //=======================================================
@@ -98,6 +98,8 @@ export function App() {
 
         //save number of players in local storage
         localStorage.setItem("numPlayers", numPlayers)
+        //save players in local storage
+        localStorage.setItem("thePlays", JSON.stringify(thePlayers))
 
         if (msg.position !== undefined) {
 
@@ -133,7 +135,8 @@ export function App() {
           }))
 
         } else if (leadSecs === 10 && timerMsg === 'Game starting in 10 seconds') {
-          let waitingPlayer = document.getElementById("waitForPlayers")
+          //let waitingPlayer = document.getElementById("waitForPlayers")
+          let waitingPlayer = document.querySelector(".game-container");
           let game = document.getElementById("game")
 
           //stop the timer
