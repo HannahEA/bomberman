@@ -6,22 +6,25 @@ import stageStart from "../static/sounds/02 Stage Start.ogg"
 import mainBGM from "../static/sounds/03 Main BGM.ogg"
 
 let isPlaying = true;
-var audio2 = new Audio(stageStart)
+var audio2 = new Audio(stageStart);
 var audio3 = new Audio(mainBGM);
-
+var idx;
+var thePlayArray;
+var whoAmI;
 
 /** @jsx Web_pilot.createElement */
 export function WaitForPlayers(props) {
 
-    var thePlayers = []
+    var thePlayers = [];
     var numPlayers = 0;
+
     var timerMsg = "";
 
     function stgStart() {
 
         if (isPlaying) {
             audio3.currentTime = 0;
-            
+
             audio3.play();
         } else {
             audio3.pause()
@@ -51,7 +54,12 @@ export function WaitForPlayers(props) {
                 thePlayers = msg.data;
                 numPlayers = msg.data.length;
                 document.querySelector("#numPlay").innerHTML = `Number of Players:  ${numPlayers}`;
-
+                idx = localStorage.getItem('position');
+                thePlayArray = JSON.parse(localStorage.getItem('thePlays') || '[]');
+                whoAmI = thePlayArray[idx];
+                console.log("thePlays and position", localStorage.getItem('thePlays'), idx, thePlayArray[idx])
+                //display Bomberman's name
+                document.querySelector("#whoAmI").innerHTML = `Bomberman ${whoAmI}`;
                 if (numPlayers >= 1) {
 
                     stgStart()
@@ -92,7 +100,7 @@ export function WaitForPlayers(props) {
 
             <center>
                 <div>
-                    <h1 >Bomberman</h1>
+                    <h1 id="whoAmI" >Bomberman</h1>
                 </div>
                 <div>
                     <span className="info">

@@ -1,6 +1,7 @@
 import { ctx, tileMap, drawPlayer, players } from "./game"
 import { self } from "./game";
 import deadAngel from "../static/sounds/deadAngel.ogg"
+//import {whoAmI} from "./waitForPlayers"
 
 //=======> Start Heart and Explosion variables and functions <=======
 //var isPlaying = false;
@@ -118,17 +119,17 @@ function undrawExplosion(b) {
 
                 spot.forEach(
                     (n) => {
-                        
+
                         if (n > 2 && n < 7) {
                             //tries++
-                            console.log("Exploded player index is:", n -3)
+                            console.log("Exploded player index is:", n - 3)
                             console.log("tries at start, 2 x player's index, and player's lives", tries, self.index, players[n - 3].index, players[n - 3].lives)
                             //check players number of lives
                             if (players[n - 3].lives > 1) {
                                 if (players[n - 3].index === self.index) {
                                     //derive which heart to remove
-                                    console.log("type of players.index", typeof(players[n - 3].index))
-                                    
+                                    console.log("type of players.index", typeof (players[n - 3].index))
+
                                     //Bomberman looses one life
                                     players[n - 3].lives--
                                     //determine number of tries
@@ -137,18 +138,23 @@ function undrawExplosion(b) {
                                     lostHeart = document.getElementById(`heart${tries}`)
                                     //heart exploding and disappearing
                                     lostHeart.style.opacity = "0"
-                                    puff(tries); 
+                                    puff(tries);
+
                                 }
 
                                 drawPlayer(n - 3)
 
                             } else {
                                 //if 1: take away life and show game over
-                                if(players[n-3].index === self.index){
+                                if (players[n - 3].index === self.index) {
                                     tries = 3;
                                     lostHeart = document.getElementById(`heart${tries}`)
                                     lostHeart.style.opacity = "0"
                                     puff(tries);
+                                    //display end of game message
+                                    document.querySelector("#whoAmI").innerHTML = '<p> GAME OVER<br>'
+                                        + `Better luck next time ${whoAmI}</p>`
+                                        ;
                                 }
 
                             }

@@ -11,7 +11,7 @@ import { Chat } from "./chat.jsx";
 export function App() {
 
   const chat = document.getElementById('chat');
-  const dataArray = []
+  var dataArray = []
   var leadSecs = 0;
 
   //=======================================================
@@ -98,6 +98,8 @@ export function App() {
 
         //save number of players in local storage
         localStorage.setItem("numPlayers", numPlayers)
+        //save players in local storage
+        localStorage.setItem("thePlays", JSON.stringify(thePlayers))
 
         if (msg.position !== undefined) {
 

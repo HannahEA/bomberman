@@ -1,4 +1,4 @@
-import { Web_pilot } from "../Webpilot/web_pilot.jsx"; 
+import { Web_pilot } from "../../web_pilot/web_pilot.jsx"; 
 import { progBomb, unBomb } from "./bomb.jsx";
 import { Player,TileMap, Bomb } from "./class.jsx";
 
