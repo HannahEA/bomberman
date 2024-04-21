@@ -7,12 +7,17 @@ import { Chat } from "./chat.jsx";
 //Bomberman soundtracks in frontend/static/sounds are sourced from: 
 //https://downloads.khinsider.com/game-soundtracks/album/bomberman-nes
 
+
+
 /** @jsx Web_pilot.createElement */
 export function App() {
 
   const chat = document.getElementById('chat');
   var dataArray = []
   var leadSecs = 0;
+
+
+
 
   //=======================================================
   //=============== Create WebSocket connection Start =====
@@ -23,6 +28,8 @@ export function App() {
   //========================================================
   //=============== Create WebSocket connection End  =======
   //========================================================
+
+
 
   var thePlayers = []
   var numPlayers = 0;
@@ -138,6 +145,8 @@ export function App() {
           //let waitingPlayer = document.getElementById("waitForPlayers")
           let waitingPlayer = document.querySelector(".game-container");
           let game = document.getElementById("game")
+          let instruct = document.getElementById("instruct")
+
 
           //stop the timer
           socket.send(JSON.stringify({
@@ -149,9 +158,12 @@ export function App() {
             //load the game
             waitingPlayer.style.display = "none"
             game.style.display = "block"
-            let n = localStorage.getItem("numPlayers")
-            let p = localStorage.getItem("position")
-            GameLoad(n, p)
+            instruct.style.display = "block"
+            
+            socket.send(JSON.stringify({
+              type: "gameLoad",
+              
+            }))
             clearTimeout(gameStarts);
           }, 15);
         }
@@ -187,7 +199,7 @@ export function App() {
 
   // add game movemnet eventlistener to movement
   //onkeydown - start moving - clear Timeout
-  window.addEventListener("keydown", function(e){StartMove(socket, e)})
+  //window.addEventListener("keydown", function(e){StartMove(socket, e)})
   //onkeyup - stop moving - clear Timeout
   //window.addEventListener("keyup", StopMove)
 

@@ -241,7 +241,20 @@
     font-size: 14px;
     line-height: 25px;
     padding-left: 15px;
-    padding-top: 100px;
+    padding-top: 300px;
+  }
+
+  #instruct{
+    height:calc(100% - 80%);
+    text-align: left;
+    color: hsl(0, 85%, 61%);
+    opacity: 1;
+    font-family: "BomberFont";
+    font-size: 14px;
+    line-height: 25px;
+    padding-left: 700px;
+    padding-top: 1500px;
+    display:none;
   }
 
   h3{

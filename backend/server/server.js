@@ -16,6 +16,13 @@ var waiting = '';
 
 wss.on('connection', function connection(ws) {
 
+  //to find key by value in a map
+  function getByValue(map, searchValue) {
+    for (let [key, value] of map.entries()) {
+      if (value === searchValue)
+        return key;
+    }
+  }
 
 
   //========================================================
@@ -56,7 +63,7 @@ wss.on('connection', function connection(ws) {
   function tenSecondsStart() {
     seconds = 0
     console.log("tenSecondsStart has been called")
-    seconds= 0
+    seconds = 0
     timer = setTimeout(function () {
       timeStatus = true;
       timeInterval = setInterval(startTimer, 1000);
@@ -96,7 +103,7 @@ wss.on('connection', function connection(ws) {
       }));
     }
 
-    if(leadingSecs === '20' && waiting === 'wait20'){
+    if (leadingSecs === '20' && waiting === 'wait20') {
       //assign the waiting variable 
       waiting = 'wait10';
       for (let [nickname, ws] of clients) {
@@ -109,7 +116,7 @@ wss.on('connection', function connection(ws) {
       //stop the timer
       clear()
 
-    }else if(leadingSecs === '10' && waiting === 'wait10'){
+    } else if (leadingSecs === '10' && waiting === 'wait10') {
       //assign the waiting variable 
       waiting = 'gameOn';
       //send signal to start game
@@ -121,7 +128,7 @@ wss.on('connection', function connection(ws) {
         }));
       }
 
-console.log("waiting inside startTimer:",waiting)
+      console.log("waiting inside startTimer:", waiting)
 
       //stop the timer
       clear()
@@ -162,11 +169,11 @@ console.log("waiting inside startTimer:",waiting)
       case 'openMessage':
         //send map to client when ws opens. Used inside nickName component
 
-          ws.send(JSON.stringify({
-            type: 'clientsMap',
-            data: Array.from(clients.keys())
-          }
-          ));
+        ws.send(JSON.stringify({
+          type: 'clientsMap',
+          data: Array.from(clients.keys())
+        }
+        ));
 
         break;
 
@@ -192,22 +199,22 @@ console.log("waiting inside startTimer:",waiting)
             type: 'nkNameChk',
             data: 'Welcome Bomberman!'
           }));
-          
+
           //send array of clients and Bomberman position to all clients
           for (let [nickname, ws] of clients) {
             let clientsM = {
               type: 'clientsMap',
               data: Array.from(clients.keys()),
             }
-            if (wsMessage.nickname === nickname ) {
+            if (wsMessage.nickname === nickname) {
               clientsM.position = Array.from(clients.keys()).length - 1,
-              clientsM.whoAmI = wsMessage.nickname
+                clientsM.whoAmI = wsMessage.nickname
             }
-              
+
             ws.send(JSON.stringify(clientsM));
 
-              console.log("nickname, array, position %n", nickname, Array.from(clients.keys()), Array.from(clients.keys()).length - 1)
-              console.log("waiting value inside server.js:", waiting);
+            console.log("nickname, array, position %n", nickname, Array.from(clients.keys()), Array.from(clients.keys()).length - 1)
+            console.log("waiting value inside server.js:", waiting);
 
           }
           let m = JSON.stringify(Layout.flat())
@@ -217,7 +224,7 @@ console.log("waiting inside startTimer:",waiting)
             JSON.stringify(
               {
                 type: "board",
-                map: map 
+                map: map
               }
             )
           )
@@ -343,17 +350,49 @@ console.log("waiting inside startTimer:",waiting)
       case 'playerMove':
         for (let [_, ws] of clients) {
           ws.send(
-          JSON.stringify(
-            {
-              type: "playerMove",
-              player: wsMessage.player,
-              direction: wsMessage.direction
-            }
+            JSON.stringify(
+              {
+                type: "playerMove",
+                player: wsMessage.player,
+                direction: wsMessage.direction
+              }
+            )
           )
-        )
         }
-        
+
         break
+
+      case 'removePlayer':
+        console.log("clients map before removing player", clients)
+        //find nickname by ws value:
+        let nnm = getByValue(clients, ws)
+        console.log("nickname to remove", nnm)
+        ////close client ws connection & remove client from clients map
+        for (let [nickname, ws] of clients) {
+          if (nnm === nickname) {
+            //close ws connection
+            ws.close();
+            clients.delete(nickname)
+          }
+        }
+
+        console.log("clients map after removing player", clients)
+
+        //send rump clients map to remaining players
+        for (let [client, ws] of clients) {
+          ws.send(JSON.stringify({
+            type: 'clientsMap',
+            data: Array.from(clients.keys())
+          }));
+        }
+
+        break
+      case 'gameLoad':
+        ws.send(JSON.stringify({
+          type: 'gameLoad',
+        }));
+      break 
+
     }
 
     //~~~~~~~~~~~~~~ END OF Msg.Type Switch ~~~~~~~~~~~~~~~

@@ -129,23 +129,17 @@ export function WaitForPlayers(props) {
                             <h2 id="time" >Count down: 00</h2>
                         </span>
 
-                        {/* <h3>'p' to play</h3>
-                        <h3>'s' to stop</h3>
-                        <h3>'r' to re-start</h3>
-                        <h3>'c' to continue</h3>
-                        <h3>'space bar' to shoot</h3>
-                        <h3><strong>⇦ ⇨</strong> move left right</h3> */}
+                        </div>
+                        <div id="countdown"></div>
+                        {/* <div className="bomberChat">
+                            <span>
+                            <h1>Bomberman Chat</h1>
+                            <pre id="messages" style="height: 400px; overflow: scroll"></pre>
+                            <input type="text" id="messageBox" placeholder="Type your message here" style="display: block; width: 100%; margin-bottom: 10px; padding: 10px;" />
+                            <button id="send" title="Send Message!" style="width: 100%; height: 30px;">Send Message</button>
+                            </span>
+                            </div> */}
                     </div>
-                    <div id="countdown"></div>
-                    {/* <div className="bomberChat">
-                        <span>
-                        <h1>Bomberman Chat</h1>
-                        <pre id="messages" style="height: 400px; overflow: scroll"></pre>
-                        <input type="text" id="messageBox" placeholder="Type your message here" style="display: block; width: 100%; margin-bottom: 10px; padding: 10px;" />
-                        <button id="send" title="Send Message!" style="width: 100%; height: 30px;">Send Message</button>
-                        </span>
-                        </div> */}
-                </div>
             </center>
         </div>
     )
