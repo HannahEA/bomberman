@@ -33,6 +33,7 @@ export function WaitForPlayers(props) {
     function countToTen() {
 
         if (isPlaying) {
+
             audio2.currentTime = 0;
             audio2.play();
         } else {

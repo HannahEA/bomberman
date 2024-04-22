@@ -518,12 +518,13 @@ export function Game(props) {
                                 console.log("tries at start, 2 x player's index, and player's lives", tries, self.index, players[n - 3].index, players[n - 3].lives)
                                 //check players number of lives
                                 if (players[n - 3].lives > 1) {
+                                    //Bomberman looses one life
+                                        players[n - 3].lives--
                                     if (players[n - 3].index === self.index) {
                                         //derive which heart to remove
                                         console.log("type of players.index", typeof (players[n - 3].index))
 
-                                        //Bomberman looses one life
-                                        players[n - 3].lives--
+                                        
                                         //determine number of tries
                                         tries = 3 - players[n - 3].lives
                                         //remove heart that has the same number as the number of tries
@@ -635,14 +636,14 @@ export function Game(props) {
 
     return (
         <div id="di">
-            <canvas id='game'></canvas>
-
+            <span><canvas id='game'></canvas></span>
+            <span style={{width: 355+'px', height: 80+'px', fontSize: 1.5+'em'}} >
             <div id="instruct">
                 <h3>'space bar' to drop bomb</h3>
-                <h3><strong>⇦ ⇨</strong> move left right</h3>
-                <h3><strong>⇧ ⇩</strong> move up down</h3>
-            </div>
-            
+                <h3><strong>⇦ ⇨ ⇧ ⇩</strong> move left right up down</h3>
+                {/* <h3><strong>⇧ ⇩</strong> move up down</h3> */}
+            </div></span>
+
         </div>
     )
 }
