@@ -62,6 +62,16 @@ export function WaitForPlayers(props) {
                 document.querySelector("#whoAmI").innerHTML = `Bomberman ${whoAmI}`;
                 if (numPlayers >= 1) {
 
+                    if (numPlayers === 1 && (timerMsg === "Game starting in 10 seconds" || timerMsg === "gameOn")) {
+                        console.log("the countdownMsg when only one player left:", timerMsg)
+                        whoAmI = thePlayers[0];
+
+                        document.querySelector("#whoAmI").innerHTML = "<span style='color: gold;'><p>🏆 YOU WON!</span><br>"
+                            + `Well done ${whoAmI}</p>`;
+                    
+                    
+                        }
+
                     stgStart()
                 }
 
@@ -130,9 +140,9 @@ export function WaitForPlayers(props) {
                             <h2 id="time" >Count down: 00</h2>
                         </span>
 
-                        </div>
-                        <div id="countdown"></div>
-                        {/* <div className="bomberChat">
+                    </div>
+                    <div id="countdown"></div>
+                    {/* <div className="bomberChat">
                             <span>
                             <h1>Bomberman Chat</h1>
                             <pre id="messages" style="height: 400px; overflow: scroll"></pre>
@@ -140,7 +150,7 @@ export function WaitForPlayers(props) {
                             <button id="send" title="Send Message!" style="width: 100%; height: 30px;">Send Message</button>
                             </span>
                             </div> */}
-                    </div>
+                </div>
             </center>
         </div>
     )

@@ -363,7 +363,7 @@ wss.on('connection', function connection(ws) {
         break
 
       case 'removePlayer':
-        console.log("clients map before removing player", clients)
+        //console.log("clients map before removing player", clients)
         //find nickname by ws value:
         let nnm = getByValue(clients, ws)
         console.log("nickname to remove", nnm)
