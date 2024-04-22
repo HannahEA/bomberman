@@ -28,6 +28,18 @@ const url = "https://drive.google.com/drive/u/0/folders/1MN3N9JVBdpcHj7dPlnEbvff
 /** @jsx Web_pilot.createElement */
 export function Game(props) {
 
+    let speed = 4;
+    var fps = 0;
+
+    //change speed of game
+    function changeSpeed() {
+        if (speed >= 2) {
+            speed--;
+        } else {
+            speed;
+        }
+    }
+
     props.socket.addEventListener("message", function (e) {
         var msg = JSON.parse(e.data);
         switch (msg.type) {
@@ -142,25 +154,25 @@ export function Game(props) {
     /////------------MOVEMENT THROTTLE -----------------------------------
 
     /// throttle movement so characters dont move too fast
-    function moveThrottle(func, waitMS = 200) {
+    function moveThrottle(func, waitMS) {
         let isWait = false;
 
         return function (...args) {
             //console.log("what is args? ", ...args, args)
-            if (!isWait) {
+            
                 func.call(this, ...args);
                 isWait = true;
-
+                
                 setTimeout(() => {
                     isWait = false;
                 }, waitMS);
-            }
+            
         }
     }
 
 
-    const throttledMove = moveThrottle(SendMove)
-
+    const throttledMove = moveThrottle(SendMove, 1000)
+    const fastThrottledMove = moveThrottle(SendMove, 200)
     /// send move to ws 
     function SendMove(direction, socket) {
         console.log("sending player move to server", direction, self.index)
@@ -169,6 +181,7 @@ export function Game(props) {
             player: self.index,
             direction: direction
         }));
+        
     }
 
     /// keydown event listener
@@ -178,7 +191,15 @@ export function Game(props) {
 
             if (e.key == "ArrowRight" || e.key == "ArrowLeft" || e.key == "ArrowUp" || e.key == "ArrowDown" || e.key == " ") {
                 // only called if at least 200ms since last call
-                throttledMove(e.key, socket)
+                    if (self.speed > 0) {
+                        fastThrottledMove(e.key, socket)
+                    } else {
+                        throttledMove(e.key, socket)
+                    }
+                    //SendMove(e.key, socket)
+                    
+                
+                
             }
 
         }
@@ -312,16 +333,17 @@ export function Game(props) {
                 pArr.splice(0, 1)
             } else if (pArr.includes(10)) {
                 p.speed++
-                console.log("player", plI, "has gained a power up. Speed no.", p.speed)
+                changeSpeed()
+                console.log("player", plI, "has gained a power up. Speed no.", p.speed, "new speed", speed)
                 pArr.splice(0, 1)
             }
             //set index of the currently moving player to null as they have finished moving
             plI = null
             //set direction back to an empty string
             direction = ""
-
+            
         }
-
+        
         window.requestAnimationFrame(gameLoop)
     }
 
@@ -519,12 +541,12 @@ export function Game(props) {
                                 //check players number of lives
                                 if (players[n - 3].lives > 1) {
                                     //Bomberman looses one life
-                                        players[n - 3].lives--
+                                    players[n - 3].lives--
                                     if (players[n - 3].index === self.index) {
                                         //derive which heart to remove
                                         console.log("type of players.index", typeof (players[n - 3].index))
 
-                                        
+
                                         //determine number of tries
                                         tries = 3 - players[n - 3].lives
                                         //remove heart that has the same number as the number of tries
@@ -534,7 +556,7 @@ export function Game(props) {
                                         puff(tries);
 
                                     }
-
+                                    players[n-3].speed = 0
                                     drawPlayer(n - 3)
 
                                 } else {
@@ -637,12 +659,12 @@ export function Game(props) {
     return (
         <div id="di">
             <span><canvas id='game'></canvas></span>
-            <span style={{width: 355+'px', height: 80+'px', fontSize: 1.5+'em'}} >
-            <div id="instruct">
-                <h3>'space bar' to drop bomb</h3>
-                <h3><strong>⇦ ⇨ ⇧ ⇩</strong> move left right up down</h3>
-                {/* <h3><strong>⇧ ⇩</strong> move up down</h3> */}
-            </div></span>
+            <span style={{ width: 355 + 'px', height: 80 + 'px', fontSize: 1.5 + 'em' }} >
+                <div id="instruct">
+                    <h3>'space bar' to drop bomb</h3>
+                    <h3><strong>⇦ ⇨ ⇧ ⇩</strong> move left right up down</h3>
+                    {/* <h3><strong>⇧ ⇩</strong> move up down</h3> */}
+                </div></span>
 
         </div>
     )
