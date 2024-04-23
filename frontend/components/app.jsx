@@ -1,7 +1,7 @@
 import { Web_pilot } from "../../web_pilot/web_pilot";
 import { NickNames } from "./nickName";
 import { WaitForPlayers } from "./waitForPlayers.jsx";
-import { Game, StartMove, GameLoad } from "./game.jsx";
+import { Game} from "./game.jsx";
 import { Chat } from "./chat.jsx";
 
 //Bomberman soundtracks in frontend/static/sounds are sourced from: 

@@ -73,6 +73,7 @@ export function WaitForPlayers(props) {
                 whoAmI = thePlayArray[idx];
                 console.log("thePlays and position", localStorage.getItem('thePlays'), idx, thePlayArray[idx])
                 //display Bomberman's name
+                console.log("number of players", numPlayers)
                 document.querySelector("#whoAmI").innerHTML = `Bomberman ${whoAmI}`;
                 if (numPlayers >= 1) {
 

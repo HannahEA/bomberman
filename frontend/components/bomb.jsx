@@ -1,7 +1,11 @@
 import { ctx, tileMap, drawPlayer, players } from "./game"
 import { self } from "./game";
+import deadAngel from "../static/sounds/deadAngel.ogg"
+import { whoAmI } from "./waitForPlayers";
+//import {whoAmI} from "./waitForPlayers"
 
-export function drawExplosion(b) {
+
+function drawExplosion(b) {
 
     if (b.start === b.previousTimeStamp) {
         console.log("drawing first tile")
@@ -69,31 +73,34 @@ export function drawExplosion(b) {
     b.count++
 }
 
+
+
+
 export function progBomb(b, timeStamp) {
 
 
     const elapsed = timeStamp - b.start;
     const increment = timeStamp - b.previousTimeStamp
     //make sure 3 secs have passed before starting  explosion
-    if (elapsed >= 3000 && increment >= 300) {
-
-        // progressively display explosion
-        //X++54 Y++50.6  x-379 y-354
-        console.log("explosion starting")
-        drawExplosion(b)
-        b.previousTimeStamp = timeStamp;
-    }
-    //check to see if explosion is complete > status = exploded
-    //flames power up lets explosion reach 1 square further
-    let power = players[b.playerI].flames
-    console.log("how many flames power ups are being used")
-    if ((power === 0 && b.count === 3) || (power > 0 && b.count === 3 + power)) {
+      if (elapsed >= 3000 && increment>=300  ) {
+        
+            // progressively display explosion
+            //X++54 Y++50.6  x-379 y-354
+            console.log("explosion starting")
+            drawExplosion(b)
+            b.previousTimeStamp = timeStamp;
+      }
+        //check to see if explosion is complete > status = exploded
+        //flames power up lets explosion reach 1 square further
+        let power = players[b.playerI].flames
+        console.log("how many flames power ups are being used", players[b.playerI].flames)
+        if ((power === 0 && b.count===2) || (power > 0  && b.count=== 2 + power) ) {
         //if( b.count > 2){
-        console.log("bomb exploded")
-        b.status = "exploded"
-        b.count--
-        players[b.playerI].flames = 0
-    }
+            console.log("bomb exploded")
+            b.status = "bomb exploded"
+            b.count--
+            players[b.playerI].flames = 0
+        }
+    
 }
-
 
