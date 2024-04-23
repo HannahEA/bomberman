@@ -61,7 +61,10 @@ export function WaitForPlayers(props) {
                 //display Bomberman's name
                 document.querySelector("#whoAmI").innerHTML = `Bomberman ${whoAmI}`;
                 if (numPlayers >= 1) {
-
+                    if ((numPlayers === 1)&& (timerMsg=== "Game starting in 10 seconds" || timerMsg === "gameOn")) {
+                        whoAmI = thePlayers[0]
+                        document.querySelector("#whoAmiI").innerHTML = "<span style= 'color: gold;'> <p>🏆 YOU WON!</span><br>" + `Well done ${whoAmI}<p>`
+                    }
                     stgStart()
                 }
 

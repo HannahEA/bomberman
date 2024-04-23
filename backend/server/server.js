@@ -354,6 +354,12 @@ console.log("waiting inside startTimer:",waiting)
         }
         
         break
+      case 'gameLoad':
+        ws.send(JSON.stringify(
+          {
+            type: 'gameLoad'
+          }
+        ))
     }
 
     //~~~~~~~~~~~~~~ END OF Msg.Type Switch ~~~~~~~~~~~~~~~

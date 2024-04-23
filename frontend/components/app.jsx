@@ -149,9 +149,12 @@ export function App() {
             //load the game
             waitingPlayer.style.display = "none"
             game.style.display = "block"
-            let n = localStorage.getItem("numPlayers")
-            let p = localStorage.getItem("position")
-            GameLoad(n, p)
+            
+            socket.send(JSON.stringify(
+              {
+                type: 'gameLoad',
+              }
+            ))
             clearTimeout(gameStarts);
           }, 15);
         }
