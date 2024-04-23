@@ -61,8 +61,11 @@ function drawExplosion(b) {
                         20,
                         10
                     )
-                    //if brick tile remove brick from tileMap
-                    spot.splice(0, 1)
+                    if (spot[0] === 2) {
+                        //if brick tile remove brick from tileMap
+                        spot.splice(0, 1)
+                    }
+                    
                 }
             }
         }
@@ -92,14 +95,24 @@ export function progBomb(b, timeStamp) {
       }
         //check to see if explosion is complete > status = exploded
         //flames power up lets explosion reach 1 square further
-        let power = players[b.playerI].flames
+        //let power = players[b.playerI].flames
+        let flames = false
+        let powerUps = players[b.playerI].powerUps
+        if (powerUps.length > 0) {
+            flames = powerUps[0] === "flames"
+        }
         console.log("how many flames power ups are being used", players[b.playerI].flames)
-        if ((power === 0 && b.count===2) || (power > 0  && b.count=== 2 + power) ) {
+        if ((!flames && b.count===2) || (flames && b.count=== 3) ) {
         //if( b.count > 2){
             console.log("bomb exploded")
             b.status = "bomb exploded"
             b.count--
-            players[b.playerI].flames = 0
+            if (powerUps.length > 0 ) {
+                console.log("array before shift",  players[b.playerI].powerUps)
+                players[b.playerI].powerUps.splice(0, 1)
+                console.log("getting rid of firsst power up", players[b.playerI].powerUps)
+            }
+            
         }
     
 }
