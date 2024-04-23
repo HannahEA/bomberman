@@ -343,11 +343,12 @@ export function Game(props) {
                                         puff(tries);
                                         
                                     }
-                                    console.log("speed before: ++++++++++++=", players[n - 3].speed)
-                                    players[n - 3].speed = 0;
-                                    players[n - 3].bombs = 0
-                                    players[n - 3].flames = 0
-                                    console.log("speed after: -------------=", players[n - 3].speed)
+                                    console.log("powerup before: ++++++++++++=", players[n - 3].powerUps)
+                                    //players[n - 3].speed = 0;
+                                    //players[n - 3].bombs = 0
+                                    //players[n - 3].flames = 0
+                                    players[n - 3].powerUps = []
+                                    console.log("speed after: -------------=", players[n - 3].powerUps)
                                     drawPlayer(n - 3)
 
                                 } else {

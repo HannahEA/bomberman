@@ -37,40 +37,51 @@ export function move(plI, direction, time) {
     //check direction the player is moving
     if (direction == " ") {
         console.log("how many bombs do you have?", )
-        //create one bomb for each bombs power up the player has
-        for ( let i=0; i<=players[plI].bombs; i++) {
-            // create bomb at player position 
-            console.log("new bomb",p.cCol+i, p.cRow, p.cX+(20*i), p.cY, time, plI )
-            let b
-            if (right){
-                b = new Bomb(p.cCol+i, p.cRow, p.cX+(20*i), p.cY, time, plI)
-                drawGrass( p.cX+(20*i), p.cY)
-                drawBomb(p.cX+(20*i), p.cY, plI)
-                tileMap.map[p.cRow][p.cCol+i].splice(0, 0, 7)
-            } else if (left) {
-                b = new Bomb(p.cCol-i, p.cRow, p.cX-(20*i), p.cY, time, plI)
-                drawGrass( p.cX-(20*i), p.cY)
-                drawBomb( p.cX-(20*i), p.cY, plI)
-                tileMap.map[p.cRow][p.cCol-i].splice(0, 0, 7)
-            } else if (up) {
-                b = new Bomb(p.cCol, p.cRow-i, p.cX, p.cY-(10*i), time, plI)
-                drawGrass( p.cX, p.cY-(10*i))
-                drawBomb(p.cX, p.cY-(10*i), plI)
-                tileMap.map[p.cRow-i][p.cCol].splice(0, 0, 7)
-            } else if (down) {
-                b = new Bomb(p.cCol, p.cRow+i, p.cX, p.cY+(10*i), time, plI)
-                drawGrass( p.cX, p.cY+(10*i))
-                drawBomb(p.cX, p.cY+(10*i), plI)
-                tileMap.map[p.cRow+i][p.cCol].splice(0, 0, 7)
+        //create one bomb 
+        b = new Bomb(p.cCol, p.cRow, p.cX, p.cY, time, plI)
+        drawGrass( p.cX, p.cY)
+        drawBomb(p.cX, p.cY, plI)
+        drawPlayer(plI)
+        tileMap.map[p.cRow][p.cCol].splice(0, 0, 7) 
+        bombs.push(b) 
+        console.log("new bomb created:", bombs, tileMap.map[p.cRow][p.cCol])
+
+        //for ( let i=0; i<=players[plI].bombs; i++) {
+        //create bomb if player has a bomb power up lined up
+        if (p.powerUps.length>0) {
+            if (p.powerUps[0] === "bombs") {
+                // create bomb next to player position 
+                console.log("new bomb",p.cCol+i, p.cRow, p.cX+(20*i), p.cY, time, plI )
+                let b
+                if (right){
+                    b = new Bomb(p.cCol+1, p.cRow, p.cX+20, p.cY, time, plI)
+                    drawGrass( p.cX+20, p.cY)
+                    drawBomb(p.cX+20, p.cY, plI)
+                    tileMap.map[p.cRow][p.cCol+1].splice(0, 0, 7)
+                } else if (left) {
+                    b = new Bomb(p.cCol-1, p.cRow, p.cX-20, p.cY, time, plI)
+                    drawGrass( p.cX-20, p.cY)
+                    drawBomb( p.cX-20, p.cY, plI)
+                    tileMap.map[p.cRow][p.cCol-i].splice(0, 0, 7)
+                } else if (up) {
+                    b = new Bomb(p.cCol, p.cRow-1, p.cX, p.cY-10, time, plI)
+                    drawGrass( p.cX, p.cY-10)
+                    drawBomb(p.cX, p.cY-10, plI)
+                    tileMap.map[p.cRow-i][p.cCol].splice(0, 0, 7)
+                } else if (down) {
+                    b = new Bomb(p.cCol, p.cRow+1, p.cX, p.cY+10, time, plI)
+                    drawGrass( p.cX, p.cY+10)
+                    drawBomb(p.cX, p.cY+10, plI)
+                    tileMap.map[p.cRow+i][p.cCol].splice(0, 0, 7)
+                }
+                
+                bombs.push(b)
+                console.log("new extra bomb created:", bombs)
             }
-            if (i === 0) {
-              drawPlayer(plI)  
-            }
-            bombs.push(b)
-            console.log("new bomb created:", bombs)
         }
-        
-        players[plI].bombs = 0 
+    
+       // players[plI].bombs = 0 
+       
         //cX position can not be greater than the x position of the last grass tile
     } else if (direction == "ArrowRight" && right) { 
 
@@ -141,16 +152,23 @@ function checkPowerUps(p, plI) {
         //check if the positin the player has moved into contains a power up
         if (tileMap.map[p.cRow][p.cCol].includes(8) ){
             //add to power up count
-            p.bombs++
-            console.log("player", plI, "has gained a power up. Bombs no.", p.bombs)
+            //p.bombs++
+            //p.powerUps.splice(0,0,"bombs")
+            //p.powerUps.splice(0,0,"bombs")
+            p.powerUps.push("bombs")
+            p.powerUps.push("bombs")
+            console.log("player", plI, "has gained a power up. Bombs no.", p.powerUps)
             tileMap.map[p.cRow][p.cCol].splice(0,1)
         } else if (tileMap.map[p.cRow][p.cCol].includes(9)) {
-            p.flames++
-            console.log("player", plI, "has gained a power up. Flames no.", p.flames)
+            //p.flames++
+            //p.powerUps.splice(0,0,"flames")
+            p.powerUps.push("flames")
+            console.log("player", plI, "has gained a power up. Flames no.", p.powerUps)
             tileMap.map[p.cRow][p.cCol].splice(0,1)
         } else if (tileMap.map[p.cRow][p.cCol].includes(10)) {
             p.speed++
-            console.log("player", plI, "has gained a power up. Speed no.", p.speed)
+            //p.powerUps.push("speed")
+            console.log("player", plI, "has gained a power up. Speed no.", p.powerUps)
             tileMap.map[p.cRow][p.cCol].splice(0,1)
         }
 }

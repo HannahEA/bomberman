@@ -162,6 +162,7 @@ export class Player {
         this.cRow = sRow
         this.cCol = sCol
         //no. of powerups 
+        this.powerUps = []
         this.bombs = 0
         this.flames = 0
         this.speed = 0
