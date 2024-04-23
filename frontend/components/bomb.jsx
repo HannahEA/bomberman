@@ -1,11 +1,9 @@
-import { ctx, tileMap, players, bombs, self } from "./game"
-import { drawPlayer } from "./move";
-
-
+import { ctx, tileMap, drawPlayer, players } from "./game"
+import { self } from "./game";
+import deadAngel from "../static/sounds/deadAngel.ogg"
+import { whoAmI } from "./waitForPlayers";
 //import {whoAmI} from "./waitForPlayers"
 
-
-//=======> End Heart and Explosion variables and functions <=======
 
 function drawExplosion(b) {
 
@@ -29,47 +27,47 @@ function drawExplosion(b) {
         let o = [20, -20, 0, 0]
         let p = [0, 0, 10, -10]
         //forward check
-        let check = [b.col+b.count, b.col-b.count, b.row+b.count, b.row-b.count]
+        let check = [b.col + b.count, b.col - b.count, b.row + b.count, b.row - b.count]
         // backward check 
-        let bcheck = [b.col+b.count-1, b.col-b.count-1, b.row+b.count-1, b.row-b.count-1]
-        
+        let bcheck = [b.col + b.count - 1, b.col - b.count - 1, b.row + b.count - 1, b.row - b.count - 1]
+
 
         for (let i = 0; i < 4; i++) {
 
-            if (check[i]<14 && check[i]>0){
-            let spot 
-            let pSpot
-            if (i<2){
-                spot = tileMap.map[b.row][check[i]]
-                pSpot = bcheck[i]>0? tileMap.map[b.row][bcheck[i]] : []
-                console.log("spot", spot, "prevSpot", pSpot)
-            } else {
-                spot = tileMap.map[check[i]][b.col]
-                pSpot = bcheck[i]>0? tileMap.map[bcheck[i]][b.col] : []
-                console.log("spot", spot)
-            }
-            console.log("can i explode here\ndoes it have a wall?", spot.includes(1),"\ndoes the previous spot have a wall?", pSpot.includes(1))
-            if (!spot.includes(1) && pSpot && !pSpot.includes(1)) {
-                console.log("no wall present, drawing explosion")
-                //draw explosion
-                 ctx.drawImage(
-                b.explosion,
-                b.eX+(m[i]),
-                b.eY+(n[i]),
-                54,
-                51,
-                b.cX+(o[i]*b.count),
-                b.cY+(p[i]*b.count),
-                20,
-                10
-                )
-                //if brick tile remove brick from tileMap
-                spot.splice(0, 1)
+            if (check[i] < 14 && check[i] > 0) {
+                let spot
+                let pSpot
+                if (i < 2) {
+                    spot = tileMap.map[b.row][check[i]]
+                    pSpot = bcheck[i] > 0 ? tileMap.map[b.row][bcheck[i]] : []
+                    console.log("spot", spot, "prevSpot", pSpot)
+                } else {
+                    spot = tileMap.map[check[i]][b.col]
+                    pSpot = bcheck[i] > 0 ? tileMap.map[bcheck[i]][b.col] : []
+                    console.log("spot", spot)
+                }
+                console.log("can i explode here\ndoes it have a wall?", spot.includes(1), "\ndoes the previous spot have a wall?", pSpot.includes(1))
+                if (!spot.includes(1) && pSpot && !pSpot.includes(1)) {
+                    console.log("no wall present, drawing explosion")
+                    //draw explosion
+                    ctx.drawImage(
+                        b.explosion,
+                        b.eX + (m[i]),
+                        b.eY + (n[i]),
+                        54,
+                        51,
+                        b.cX + (o[i] * b.count),
+                        b.cY + (p[i] * b.count),
+                        20,
+                        10
+                    )
+                    //if brick tile remove brick from tileMap
+                    spot.splice(0, 1)
+                }
             }
         }
-    }
-        
-    
+
+
     }
 
     b.count++

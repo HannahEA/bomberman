@@ -19,11 +19,7 @@ export function move(plI, direction, time) {
     let up  = !tileMap.map[p.cRow-1][p.cCol].includes(1) && !tileMap.map[p.cRow-1][p.cCol].includes(2)
     let down = !tileMap.map[p.cRow+1][p.cCol].includes(1) && !tileMap.map[p.cRow+1][p.cCol].includes(2)
     
-    // let sleft = !tileMap.map[p.cRow][p.cCol-2].includes(1) && !tileMap.map[p.cRow][p.cCol-1].includes(2)
-    // let sright = !tileMap.map[p.cRow][p.cCol+2].includes(1) &&  !tileMap.map[p.cRow][p.cCol+1].includes(2)
-    // let sup  = !tileMap.map[p.cRow-2][p.cCol].includes(1) && !tileMap.map[p.cRow-1][p.cCol].includes(2)
-    // let sdown = !tileMap.map[p.cRow+2][p.cCol].includes(1) && !tileMap.map[p.cRow+1][p.cCol].includes(2)
-    //check the array of players current position and draws all the relevant images
+  
     function draw() {
         drawGrass(p.cX, p.cY)
         pArr.forEach((n) => {  
@@ -76,20 +72,17 @@ export function move(plI, direction, time) {
         
         players[plI].bombs = 0 
         //cX position can not be greater than the x position of the last grass tile
-    } else if (direction == "ArrowRight" && ((p.speed === 0 && right) || (p.speed>0 ))) { 
+    } else if (direction == "ArrowRight" && right) { 
 
         // remove player from old position - redraw the previous tile at the old position of the player
         tileMap.map[p.cRow][p.cCol].splice(i, 1) 
         console.log("moving right", direction, "array after splice:", tileMap.map[p.cRow][p.cCol])
         draw()
         //update player position in canvas and col/row
-        if (p.speed > 0) {
-            p.cX +=40
-            p.cCol+=2
-        } else {
+        
             p.cX += 20
             p.cCol++
-        }
+        
         console.log("is p changing players\np.cCol:", p.cCol,"\nplayers[plI].cCol:", players[plI].cCol)
         //draw player in new position
         drawPlayer(plI)
@@ -97,49 +90,40 @@ export function move(plI, direction, time) {
         //update current position in the tilemap
         tileMap.map[p.cRow][p.cCol].push(p.index+3)
 
-    } else if (direction == "ArrowLeft" && ((p.speed === 0 && left) || (p.speed>0 ))) {
+    } else if (direction == "ArrowLeft" && left) {
         tileMap.map[p.cRow][p.cCol].splice(i, 1)
         console.log("i can move left", direction, "array after splice:", tileMap.map[p.cRow][p.cCol])
         draw()
-        if (p.speed > 0) {
-            p.cX-=40
-            p.cCol-=2
-        } else {
+        
             p.cX -=20
             p.cCol--
-        }
+        
         console.log("is p changing players\np.cCol:", p.cCol,"\nplayers[plI].cCol:", players[plI].cCol)
         drawPlayer(plI)
         //update current position in the tilemap
         tileMap.map[p.cRow][p.cCol].push(p.index+3)
         
-    } else if (direction == "ArrowUp" && ((p.speed === 0 && up) || (p.speed>0 ))) {
+    } else if (direction == "ArrowUp" && up) {
         tileMap.map[p.cRow][p.cCol].splice(i, 1)
         draw()
         console.log("i can move up", direction, "array after splice:", tileMap.map[p.cRow][p.cCol])
-        if (p.speed > 0) {
-            p.cY-=20
-            p.cRow-=2
-        } else{
+       
             p.cY -= 10
             p.cRow--
-        }
+        
         console.log("is p changing players\np.cCol:", p.cCol,"\nplayers[plI].cCol:", players[plI].cCol)
         drawPlayer(plI)
         //update current position in the tilemap
         tileMap.map[p.cRow][p.cCol].push(p.index+3)
         
-    } else if (direction == "ArrowDown" && ((p.speed === 0 && down) || (p.speed>0))) {
+    } else if (direction == "ArrowDown" && down) {
         tileMap.map[p.cRow][p.cCol].splice(i, 1) 
         console.log("i can move down", direction, "array after splice:", tileMap.map[p.cRow][p.cCol])
         draw()
-        if (p.speed > 0) {
-            p.cY += 20
-            p.cRow+=2
-        } else {
+        
             p.cY += 10
             p.cRow++
-        }
+        
         console.log("is p changing players\np.cCol:", p.cCol,"\nplayers[plI].cCol:", players[plI].cCol)
         drawPlayer(plI)
         //update current position in the tilemap
