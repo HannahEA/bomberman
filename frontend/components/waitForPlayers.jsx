@@ -63,7 +63,7 @@ export function WaitForPlayers(props) {
                 if (numPlayers >= 1) {
 
                     if (numPlayers === 1 && (timerMsg === "Game starting in 10 seconds" || timerMsg === "gameOn")) {
-                        console.log("the countdownMsg when only one player left:", timerMsg)
+                        
                         whoAmI = thePlayers[0];
 
                         document.querySelector("#whoAmI").innerHTML = "<span style='color: gold;'><p>🏆 YOU WON!</span><br>"

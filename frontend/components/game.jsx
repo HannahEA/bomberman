@@ -28,17 +28,17 @@ const url = "https://drive.google.com/drive/u/0/folders/1MN3N9JVBdpcHj7dPlnEbvff
 /** @jsx Web_pilot.createElement */
 export function Game(props) {
 
-    let speed = 4;
-    var fps = 0;
+
+
 
     //change speed of game
-    function changeSpeed() {
+    /*function changeSpeed() {
         if (speed >= 2) {
             speed--;
         } else {
             speed;
         }
-    }
+    }*/
 
     props.socket.addEventListener("message", function (e) {
         var msg = JSON.parse(e.data);
@@ -154,57 +154,53 @@ export function Game(props) {
     /////------------MOVEMENT THROTTLE -----------------------------------
 
     /// throttle movement so characters dont move too fast
-    function moveThrottle(func, waitMS) {
+    function moveThrottle(func, normalWaitMS, fastWaitMS) {
         let isWait = false;
 
         return function (...args) {
-            //console.log("what is args? ", ...args, args)
-            
+           
+            const waitMS = players[self.index].speed > 0 ? fastWaitMS : normalWaitMS;
+            console .log("do i have a speed powerup and what is my waitMS?", self.speed, waitMS)
+            if (!isWait) {
                 func.call(this, ...args);
                 isWait = true;
-                
+
                 setTimeout(() => {
                     isWait = false;
                 }, waitMS);
-            
-        }
+            }
+        };
     }
 
-
-    const throttledMove = moveThrottle(SendMove, 1000)
-    const fastThrottledMove = moveThrottle(SendMove, 200)
     /// send move to ws 
-    function SendMove(direction, socket) {
+    function SendMove(direction, socket)  {
         console.log("sending player move to server", direction, self.index)
         socket.send(JSON.stringify({
-            type: "playerMove",
+            type:"playerMove",
             player: self.index,
             direction: direction
         }));
-        
     }
 
-    /// keydown event listener
-    function StartMove(socket, e) {
+    const throttledMove = moveThrottle(SendMove, 500, 100);
 
-        if (document.getElementById("game").style.display === "block") {
-
-            if (e.key == "ArrowRight" || e.key == "ArrowLeft" || e.key == "ArrowUp" || e.key == "ArrowDown" || e.key == " ") {
-                // only called if at least 200ms since last call
-                    if (self.speed > 0) {
-                        fastThrottledMove(e.key, socket)
-                    } else {
-                        throttledMove(e.key, socket)
-                    }
-                    //SendMove(e.key, socket)
-                    
-                
-                
-            }
-
+    window.addEventListener('keydown', (event) => {
+        switch (event.key) {
+            case 'ArrowUp':
+            case 'ArrowDown':
+            case 'ArrowLeft':
+            case 'ArrowRight':
+                case ' ':
+                throttledMove(event.key, props.socket);
+                break;
+            default:
+                break;
         }
-    }
-    window.addEventListener("keydown", function (e) { StartMove(props.socket, e) })
+    });
+
+
+
+
     //////------------------GAMELOOP -----------------------------------------------------
     ///animation loop 
     function gameLoop(time) {
@@ -333,8 +329,8 @@ export function Game(props) {
                 pArr.splice(0, 1)
             } else if (pArr.includes(10)) {
                 p.speed++
-                changeSpeed()
-                console.log("player", plI, "has gained a power up. Speed no.", p.speed, "new speed", speed)
+                
+                console.log("player", plI, "has gained a power up. Speed no.", p.speed)
                 pArr.splice(0, 1)
             }
             //set index of the currently moving player to null as they have finished moving
@@ -556,9 +552,13 @@ export function Game(props) {
                                         puff(tries);
 
                                     }
-                                    players[n-3].speed = 0
+                                    console.log("speed before: ++++++++++++=",  players[n-3].speed)
+                                    players[n-3].speed = 0;
+                                    players[n-3].bombs = 0
+                                    players[n-3].flames = 0
+                                    console.log("speed after: -------------=",  players[n-3].speed)
                                     drawPlayer(n - 3)
-
+                                    
                                 } else {
                                     //if 1: take away life and show game over
                                     if (players[n - 3].index === self.index) {
