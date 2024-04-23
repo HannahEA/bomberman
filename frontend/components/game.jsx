@@ -1,6 +1,7 @@
 import { Web_pilot } from "../../web_pilot/web_pilot.jsx";
-import { progBomb, unBomb } from "./bomb.jsx";
-import { Player, TileMap, Bomb } from "./class.jsx";
+import { progBomb } from "./bomb.jsx";
+import { move, drawPlayer } from "./move.jsx"
+import { Player, TileMap } from "./class.jsx";
 import deadAngel from "../static/sounds/deadAngel.ogg"
 import gameOver from "../static/sounds/10 Game Over.ogg"
 import { whoAmI } from "./waitForPlayers"
@@ -20,7 +21,18 @@ const url = "https://drive.google.com/drive/u/0/folders/1MN3N9JVBdpcHj7dPlnEbvff
 //}
 
 
-
+// constants
+const tileSize = 32
+export const tileMap = new TileMap(tileSize)
+//variables
+export let ctx
+export var players = []
+export let bombs = []
+let plI = null
+let direction = ""
+////self - which player are you? websocket need to log what position you are in the 4 players 
+////make it a global variable
+var self
 
 
 
@@ -72,18 +84,7 @@ export function Game(props) {
         }
 
     })
-    // constants
-    const tileSize = 32
-    const tileMap = new TileMap(tileSize)
-    //variables
-    let ctx
-    var players = []
-    let bombs = []
-    let plI = null
-    let direction = ""
-    ////self - which player are you? websocket need to log what position you are in the 4 players 
-    ////make it a global variable
-    var self
+
 
     //--------------CREATE THE GAME BOARD------------------------------
 
@@ -158,9 +159,9 @@ export function Game(props) {
         let isWait = false;
 
         return function (...args) {
-           
+
             const waitMS = players[self.index].speed > 0 ? fastWaitMS : normalWaitMS;
-            console .log("do i have a speed powerup and what is my waitMS?", self.speed, waitMS)
+            console.log("do i have a speed powerup and what is my waitMS?", self.speed, waitMS)
             if (!isWait) {
                 func.call(this, ...args);
                 isWait = true;
@@ -173,16 +174,16 @@ export function Game(props) {
     }
 
     /// send move to ws 
-    function SendMove(direction, socket)  {
+    function SendMove(direction, socket) {
         console.log("sending player move to server", direction, self.index)
         socket.send(JSON.stringify({
-            type:"playerMove",
+            type: "playerMove",
             player: self.index,
             direction: direction
         }));
     }
 
-    const throttledMove = moveThrottle(SendMove, 500, 100);
+    const throttledMove = moveThrottle(SendMove, 600, 100);
 
     window.addEventListener('keydown', (event) => {
         switch (event.key) {
@@ -190,8 +191,12 @@ export function Game(props) {
             case 'ArrowDown':
             case 'ArrowLeft':
             case 'ArrowRight':
-                case ' ':
-                throttledMove(event.key, props.socket);
+            case ' ':
+                console.log("event target", event)
+                if (event.target.id!== "message"){
+                    throttledMove(event.key, props.socket);
+                }
+                
                 break;
             default:
                 break;
@@ -218,172 +223,20 @@ export function Game(props) {
         }
         //if plI (index of a currently moving player) is not null 
         if (plI != null) {
-            //get player object
-            let p = players[plI]
-            //get array of players current position in the tilemap
-            let pArr = tileMap.map[p.cRow][p.cCol]
-            //players index in the array of their current posiion
-            let i = pArr.indexOf(plI + 3)
-            console.log("game loop variables: player \nindex:", plI, "\ntilemap Array:", pArr, "\nplayer index in array:", i)
-
-            //check the array of players current position and draws all the relevant images
-            function draw() {
-                drawGrass()
-                pArr.forEach((n) => {
-                    console.log("drawing tile:", n)
-                    if (2 < n && n < 7) {
-                        console.log("drawing player")
-                        drawPlayer(n - 3)
-                    } else if (n == 7) {
-                        console.log("drawing bomb")
-                        drawBomb()
-                    }
-                })
-            }
-
-            //check cdirection the player is moving
-            if (direction == " ") {
-                // create bomb at player position 
-                // for ( let i=0; i<players[plI].bombs; i++) {
-                // }
-                let b = new Bomb(p.cCol, p.cRow, p.cX, p.cY, time, plI)
-                bombs.push(b)
-                console.log("new bomb created:", bombs)
-                drawGrass()
-                drawBomb()
-                drawPlayer(plI)
-                tileMap.map[p.cRow][p.cCol].splice(0, 0, 7)
-                //players[plI].bombs = 0 
-                //window.requestAnimationFrame(() => {startBomb(b)})
-                //cX position can not be greater than the x position of the last grass tile
-            } else if (direction == "ArrowRight" && !tileMap.map[p.cRow][p.cCol + 1].includes(1) && !tileMap.map[p.cRow][p.cCol + 1].includes(2)) {
-                //p.cX<255 
-                // remove player from old position - redraw the previous tile at the old position of the player
-                tileMap.map[p.cRow][p.cCol].splice(i, 1)
-                console.log("moving right", direction, "array after splice:", tileMap.map[p.cRow][p.cCol])
-                draw()
-
-                //cX++
-                //update player position in canvas and col/row
-                players[plI].cX += 20
-                players[plI].cCol++
-                console.log("is p changing players\np.cCol:", p.cCol, "\nplayers[plI].cCol:", players[plI].cCol)
-                //draw player in new position
-                drawPlayer(plI)
-
-                //update current position in the tilemap
-                tileMap.map[p.cRow][p.cCol].push(p.index + 3)
-
-            } else if (direction == "ArrowLeft" && !tileMap.map[p.cRow][p.cCol - 1].includes(1) && !tileMap.map[p.cRow][p.cCol - 1].includes(2)) {
-
-                tileMap.map[p.cRow][p.cCol].splice(i, 1)
-                console.log("i can move left", direction, "array after splice:", tileMap.map[p.cRow][p.cCol])
-                draw()
-                //cX-- p.cX>25
-                p.cX -= 20
-                p.cCol--
-                console.log("is p changing players\np.cCol:", p.cCol, "\nplayers[plI].cCol:", players[plI].cCol)
-                drawPlayer(plI)
-                //update current position in the tilemap
-                tileMap.map[p.cRow][p.cCol].push(p.index + 3)
-
-            } else if (direction == "ArrowUp" && !tileMap.map[p.cRow - 1][p.cCol].includes(1) && !tileMap.map[p.cRow - 1][p.cCol].includes(2)) {
-
-
-                tileMap.map[p.cRow][p.cCol].splice(i, 1)
-
-                draw()
-                console.log("i can move up", direction, "array after splice:", tileMap.map[p.cRow][p.cCol])
-                //cY-- p.cY>15
-                p.cY -= 10
-                p.cRow--
-                console.log("is p changing players\np.cCol:", p.cCol, "\nplayers[plI].cCol:", players[plI].cCol)
-                drawPlayer(plI)
-                //update current position in the tilemap
-                tileMap.map[p.cRow][p.cCol].push(p.index + 3)
-
-            } else if (direction == "ArrowDown" && !tileMap.map[p.cRow + 1][p.cCol].includes(1) && !tileMap.map[p.cRow + 1][p.cCol].includes(2)) {
-
-                tileMap.map[p.cRow][p.cCol].splice(i, 1)
-                console.log("i can move down", direction, "array after splice:", tileMap.map[p.cRow][p.cCol])
-                draw()
-                //cY++ p.cY<125
-                p.cY += 10
-                p.cRow++
-                console.log("is p changing players\np.cCol:", p.cCol, "\nplayers[plI].cCol:", players[plI].cCol)
-                drawPlayer(plI)
-                //update current position in the tilemap
-                tileMap.map[p.cRow][p.cCol].push(p.index + 3)
-            }
-
-            //give power ups to player if there are any present
-            //check if the positin the player has moved into contains a power up
-            if (pArr.includes(8)) {
-                //add to power up count
-                p.bombs++
-                console.log("player", plI, "has gained a power up. Bombs no.", p.bombs)
-                pArr.splice(0, 1)
-            } else if (pArr.includes(9)) {
-                p.flames++
-                console.log("player", plI, "has gained a power up. Flames no.", p.flames)
-                pArr.splice(0, 1)
-            } else if (pArr.includes(10)) {
-                p.speed++
-                
-                console.log("player", plI, "has gained a power up. Speed no.", p.speed)
-                pArr.splice(0, 1)
-            }
+            move(plI, direction, time)
             //set index of the currently moving player to null as they have finished moving
             plI = null
             //set direction back to an empty string
             direction = ""
-            
+
         }
-        
+
         window.requestAnimationFrame(gameLoop)
     }
 
 
-    function drawGrass() {
-        ctx.drawImage(
-            tileMap.grass,
-            0,
-            0,
-            779,
-            779,
-            players[plI].cX,
-            players[plI].cY,
-            20,
-            10
-        )
 
-    }
-    function drawBomb() {
-        ctx.drawImage(
-            players[plI].bomb,
-            0,
-            0,
-            255,
-            197,
-            players[plI].cX,
-            players[plI].cY,
-            20,
-            10
-        )
-    }
-    function drawPlayer(n) {
-        ctx.drawImage(
-            players[n].img,
-            players[n].playerX,
-            players[n].playerY,
-            32,
-            32,
-            players[n].cX,
-            players[n].cY,
-            20,
-            10
-        );
-    }
+
 
     //=======> Start Heart and Explosion variables and functions <=======
     var isPlaying = true;
@@ -416,73 +269,7 @@ export function Game(props) {
 
     //=======> End Heart and Explosion variables and functions <=======
 
-    function drawExplosion(b) {
 
-        if (b.start === b.previousTimeStamp) {
-            console.log("drawing first tile")
-            ctx.drawImage(
-                b.explosion,
-                b.eX,
-                b.eY,
-                54,
-                51,
-                b.cX,
-                b.cY,
-                20,
-                10
-            )
-        } else {
-            console.log("new tile\ncount", b.count, " row, col:", b.row, b.col, b.col + b.count)
-            let m = [54, -54, 0, 0]
-            let n = [0, 0, 51, -51]
-            let o = [20, -20, 0, 0]
-            let p = [0, 0, 10, -10]
-            //forward check
-            let check = [b.col + b.count, b.col - b.count, b.row + b.count, b.row - b.count]
-            // backward check 
-            let bcheck = [b.col + b.count - 1, b.col - b.count - 1, b.row + b.count - 1, b.row - b.count - 1]
-
-
-            for (let i = 0; i < 4; i++) {
-
-                if (check[i] < 14 && check[i] > 0) {
-                    let spot
-                    let pSpot
-                    if (i < 2) {
-                        spot = tileMap.map[b.row][check[i]]
-                        pSpot = bcheck[i] > 0 ? tileMap.map[b.row][bcheck[i]] : []
-                        console.log("spot", spot, "prevSpot", pSpot)
-                    } else {
-                        spot = tileMap.map[check[i]][b.col]
-                        pSpot = bcheck[i] > 0 ? tileMap.map[bcheck[i]][b.col] : []
-                        console.log("spot", spot)
-                    }
-                    console.log("can i explode here\ndoes it have a wall?", spot.includes(1), "\ndoes the previous spot have a wall?", pSpot.includes(1))
-                    if (!spot.includes(1) && pSpot && !pSpot.includes(1)) {
-                        console.log("no wall present, drawing explosion")
-                        //draw explosion
-                        ctx.drawImage(
-                            b.explosion,
-                            b.eX + (m[i]),
-                            b.eY + (n[i]),
-                            54,
-                            51,
-                            b.cX + (o[i] * b.count),
-                            b.cY + (p[i] * b.count),
-                            20,
-                            10
-                        )
-                        //if brick tile remove brick from tileMap
-                        spot.splice(0, 1)
-                    }
-                }
-            }
-
-
-        }
-
-        b.count++
-    }
 
 
     function undrawExplosion(b) {
@@ -552,13 +339,13 @@ export function Game(props) {
                                         puff(tries);
 
                                     }
-                                    console.log("speed before: ++++++++++++=",  players[n-3].speed)
-                                    players[n-3].speed = 0;
-                                    players[n-3].bombs = 0
-                                    players[n-3].flames = 0
-                                    console.log("speed after: -------------=",  players[n-3].speed)
+                                    console.log("speed before: ++++++++++++=", players[n - 3].speed)
+                                    players[n - 3].speed = 0;
+                                    players[n - 3].bombs = 0
+                                    players[n - 3].flames = 0
+                                    console.log("speed after: -------------=", players[n - 3].speed)
                                     drawPlayer(n - 3)
-                                    
+
                                 } else {
                                     //if 1: take away life and show game over
                                     if (players[n - 3].index === self.index) {
@@ -611,32 +398,6 @@ export function Game(props) {
 
     }
 
-    function progBomb(b, timeStamp) {
-
-
-        const elapsed = timeStamp - b.start;
-        const increment = timeStamp - b.previousTimeStamp
-        //make sure 3 secs have passed before starting  explosion
-        if (elapsed >= 3000 && increment >= 300) {
-
-            // progressively display explosion
-            //X++54 Y++50.6  x-379 y-354
-            console.log("explosion starting")
-            drawExplosion(b)
-            b.previousTimeStamp = timeStamp;
-        }
-        //check to see if explosion is complete > status = exploded
-        //flames power up lets explosion reach 1 square further
-        let power = players[b.playerI].flames
-        console.log("how many flames power ups are being used")
-        if ((power === 0 && b.count === 3) || (power > 0 && b.count === 3 + power)) {
-            //if( b.count > 2){
-            console.log("bomb exploded")
-            b.status = "exploded"
-            b.count--
-            players[b.playerI].flames = 0
-        }
-    }
 
     function unBomb(b, timeStamp) {
         const increment = timeStamp - b.previousTimeStamp

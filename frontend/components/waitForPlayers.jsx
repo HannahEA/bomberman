@@ -3,11 +3,14 @@ import Explosion from "../static/explosion.gif"
 import AngelHeart from "../static/Angel_Heart.png"
 import { Game, StartMove, StopMove, GameLoad } from "./game.jsx";
 import stageStart from "../static/sounds/02 Stage Start.ogg"
+import ending from "../static/sounds/08 Ending.ogg"
 import mainBGM from "../static/sounds/03 Main BGM.ogg"
 
 let isPlaying = true;
+let isTrophy = true;
 var audio2 = new Audio(stageStart);
 var audio3 = new Audio(mainBGM);
+var audio4 = new Audio(ending);
 var idx;
 var thePlayArray;
 export var whoAmI;
@@ -27,6 +30,17 @@ export function WaitForPlayers(props) {
             audio3.play();
         } else {
             audio3.pause()
+        }
+    }
+
+    function gotTrophy() {
+
+        isPlaying = false
+        if (isTrophy) {
+            audio4.currentTime = 0;
+            audio4.play();
+        } else {
+            audio4.pause()
         }
     }
 
@@ -63,16 +77,17 @@ export function WaitForPlayers(props) {
                 if (numPlayers >= 1) {
 
                     if (numPlayers === 1 && (timerMsg === "Game starting in 10 seconds" || timerMsg === "gameOn")) {
-                        
+
                         whoAmI = thePlayers[0];
 
                         document.querySelector("#whoAmI").innerHTML = "<span style='color: gold;'><p>🏆 YOU WON!</span><br>"
                             + `Well done ${whoAmI}</p>`;
-                    
-                    
-                        }
 
-                    stgStart()
+
+
+                    }
+
+                    //gotTrophy()
                 }
 
                 break;

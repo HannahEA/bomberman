@@ -188,7 +188,7 @@ export function App() {
       const stringData = String.fromCharCode(...dataArray);
 
       message.textContent = stringData;
-      chat.appendChild(stringData);
+      chat.appendChild(message);
       chat.scrollTop = chat.scrollHeight; // Scroll chat to bottom
     }
   });
