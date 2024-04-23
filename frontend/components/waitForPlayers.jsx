@@ -3,11 +3,14 @@ import Explosion from "../static/explosion.gif"
 import AngelHeart from "../static/Angel_Heart.png"
 import { Game, StartMove, StopMove, GameLoad } from "./game.jsx";
 import stageStart from "../static/sounds/02 Stage Start.ogg"
+import ending from "../static/sounds/08 Ending.ogg"
 import mainBGM from "../static/sounds/03 Main BGM.ogg"
 
 let isPlaying = true;
+let isTrophy = true;
 var audio2 = new Audio(stageStart);
 var audio3 = new Audio(mainBGM);
+var audio4 = new Audio(ending);
 var idx;
 var thePlayArray;
 export var whoAmI;
@@ -24,16 +27,27 @@ export function WaitForPlayers(props) {
 
         if (isPlaying) {
             audio3.currentTime = 0;
-
             audio3.play();
         } else {
             audio3.pause()
         }
     }
 
+    function gotTrophy() {
+
+        isPlaying = false
+        if (isTrophy) {
+            audio4.currentTime = 0;
+            audio4.play();
+        } else {
+            audio4.pause()
+        }
+    }
+
     function countToTen() {
 
         if (isPlaying) {
+
             audio2.currentTime = 0;
             audio2.play();
         } else {
@@ -62,7 +76,18 @@ export function WaitForPlayers(props) {
                 document.querySelector("#whoAmI").innerHTML = `Bomberman ${whoAmI}`;
                 if (numPlayers >= 1) {
 
-                    stgStart()
+                    if (numPlayers === 1 && (timerMsg === "Game starting in 10 seconds" || timerMsg === "gameOn")) {
+
+                        whoAmI = thePlayers[0];
+
+                        document.querySelector("#whoAmI").innerHTML = "<span style='color: gold;'><p>🏆 YOU WON!</span><br>"
+                            + `Well done ${whoAmI}</p>`;
+
+
+
+                    }
+
+                    //gotTrophy()
                 }
 
                 break;
@@ -130,22 +155,16 @@ export function WaitForPlayers(props) {
                             <h2 id="time" >Count down: 00</h2>
                         </span>
 
-                        {/* <h3>'p' to play</h3>
-                        <h3>'s' to stop</h3>
-                        <h3>'r' to re-start</h3>
-                        <h3>'c' to continue</h3>
-                        <h3>'space bar' to shoot</h3>
-                        <h3><strong>⇦ ⇨</strong> move left right</h3> */}
                     </div>
                     <div id="countdown"></div>
                     {/* <div className="bomberChat">
-                        <span>
-                        <h1>Bomberman Chat</h1>
-                        <pre id="messages" style="height: 400px; overflow: scroll"></pre>
-                        <input type="text" id="messageBox" placeholder="Type your message here" style="display: block; width: 100%; margin-bottom: 10px; padding: 10px;" />
-                        <button id="send" title="Send Message!" style="width: 100%; height: 30px;">Send Message</button>
-                        </span>
-                        </div> */}
+                            <span>
+                            <h1>Bomberman Chat</h1>
+                            <pre id="messages" style="height: 400px; overflow: scroll"></pre>
+                            <input type="text" id="messageBox" placeholder="Type your message here" style="display: block; width: 100%; margin-bottom: 10px; padding: 10px;" />
+                            <button id="send" title="Send Message!" style="width: 100%; height: 30px;">Send Message</button>
+                            </span>
+                            </div> */}
                 </div>
             </center>
         </div>

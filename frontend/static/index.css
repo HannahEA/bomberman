@@ -106,7 +106,7 @@
   #chat {
     display:none;
     position: absolute;
-    right:20px;
+    right:110px;
     top:150px;
       width: 300px;
       height: 300px;
@@ -114,6 +114,7 @@
       padding: 10px;
       overflow-y: scroll;
       margin-left: 20px;
+      margin-top:500px;
       font-family: "BomberFont";
       background-color: #f8faf6;
   }
@@ -121,7 +122,7 @@
   #message {
     display:none;
     position:absolute;
-    right:20px;
+    right:110px;
     top:460px;
       width: 300px;
       height: 50px;
@@ -129,6 +130,7 @@
       padding: 10px;
       overflow-x: scroll;
       margin-left: 20px;
+      margin-top:515px;
       font-family: "BomberFont";
       color:#f87474;
       font-size: 20px;
@@ -137,7 +139,7 @@
   #send {
     display:none;
     position:absolute;
-    right:20px;
+    right: 110px;
     top:515px;
       width: 300px;
       height: 60px;
@@ -146,6 +148,7 @@
       margin-top: 10px;
       border-radius: 15px;
       margin-left: 20px;
+      margin-top:530px;
       background-color: #f87474;
       font-family: "BomberFont";
       color: white;
@@ -241,11 +244,29 @@
     font-size: 14px;
     line-height: 25px;
     padding-left: 15px;
-    padding-top: 100px;
+    padding-top: 300px;
   }
 
+  #instruct{
+    border-color: hsl(0, 85%, 61%);
+    border-style: solid;
+    border-width: 5px;
+    width: 550px;
+    height: 120px;
+    text-align: left;
+    color:hsl(0, 85%, 61%);
+    opacity: 1;
+    font-family: "BomberFont";
+    line-height: 35px;
+    padding-left: 60px;
+    padding-top: 25px;
+    margin-top: 50px;
+    display:none;
+  }
+
+
   h3{
-    font-size: 14px;
+    font-size: 22px;
   }
 
   .game-container {
