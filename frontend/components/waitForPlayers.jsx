@@ -6,8 +6,9 @@ import stageStart from "../static/sounds/02 Stage Start.ogg"
 import ending from "../static/sounds/08 Ending.ogg"
 import mainBGM from "../static/sounds/03 Main BGM.ogg"
 
-let isPlaying = true;
-let isTrophy = true;
+var isPlaying = true;
+var isMainBGM = true;
+var isTrophy = true;
 var audio2 = new Audio(stageStart);
 var audio3 = new Audio(mainBGM);
 var audio4 = new Audio(ending);
@@ -35,7 +36,6 @@ export function WaitForPlayers(props) {
 
     function gotTrophy() {
 
-        isPlaying = false
         if (isTrophy) {
             audio4.currentTime = 0;
             audio4.play();
@@ -46,7 +46,7 @@ export function WaitForPlayers(props) {
 
     function countToTen() {
 
-        if (isPlaying) {
+        if (isMainBGM) {
 
             audio2.currentTime = 0;
             audio2.play();
@@ -76,19 +76,23 @@ export function WaitForPlayers(props) {
                 console.log("number of players", numPlayers)
                 document.querySelector("#whoAmI").innerHTML = `Bomberman ${whoAmI}`;
                 if (numPlayers >= 1) {
-
+                    console.log("numPlayers inside waitForPlayers", numPlayers)
                     if (numPlayers === 1 && (timerMsg === "Game starting in 10 seconds" || timerMsg === "gameOn")) {
+                        
 
                         whoAmI = thePlayers[0];
 
                         document.querySelector("#whoAmI").innerHTML = "<span style='color: gold;'><p>🏆 YOU WON!</span><br>"
                             + `Well done ${whoAmI}</p>`;
 
-
-
+                        //play the trophy sound
+                        isPlaying = false;
+                        isMainBGM = false;
+                            gotTrophy()
                     }
-
-                    //gotTrophy()
+                    //play the stage start sound
+                    //stgStart()
+                    
                 }
 
                 break;

@@ -95,7 +95,7 @@ export function Game(props) {
         for (let i = 0; i < numPlayers; i++) {
             const player = new Player(i, lPosition[i][0], lPosition[i][1])
             players.push(player)
-            tileMap.map[player.cCol][player.cRow].push(i+3)
+            tileMap.map[player.cCol][player.cRow].push(i + 3)
             console.log("creatomg player ", i, " my position ", position)
             if (i == position) {
                 self = new Player(i, lPosition[i][0], lPosition[i][1])
@@ -184,10 +184,10 @@ export function Game(props) {
             case 'ArrowRight':
             case ' ':
                 console.log("event target", event)
-                if (event.target.id!== "message"){
+                if (event.target.id !== "message") {
                     throttledMove(event.key, props.socket);
                 }
-                
+
                 break;
             default:
                 break;
@@ -200,24 +200,24 @@ export function Game(props) {
     //////------------------GAMELOOP -----------------------------------------------------
     ///animation loop 
     function gameLoop(time) {
-        if (bombs.length>0) {
-            bombs.forEach( (b) => {
+        if (bombs.length > 0) {
+            bombs.forEach((b) => {
                 //console.log("what is the bombs status", b.status)
                 if (b.status === "unexploded") {
                     //console.log("unexploded bomb found")
-                   progBomb(b, time) 
+                    progBomb(b, time)
                 } else if (b.status === "bomb exploded") {
                     //console.log("exploded bomb found")
-                    unBomb(b,time)
+                    unBomb(b, time)
                 } else if (b.status === "complete") {
                     //console.log("completed bomb found")
                     tileMap.map[b.row][b.col].splice(0, 1)
                 }
-            } )
-        
-            bombs = bombs.filter((b)=> b.status === "bomb exploded" || b.status === "unexploded")
+            })
+
+            bombs = bombs.filter((b) => b.status === "bomb exploded" || b.status === "unexploded")
             //console.log("bombs after", bombs)
-    
+
         }
         //if plI (index of a currently moving player) is not null 
         if (plI != null) {
@@ -246,8 +246,11 @@ export function Game(props) {
 
     //sets off explosion once after loss of one life, and plays 'deadAngel'
     function puff(t) {
+
         audio4.currentTime = 0;
         audio4.play();
+
+
         explosion = document.getElementById(`explosion${t}`);
         explosion.style.opacity = "1";
         setTimeout(() => {
@@ -335,8 +338,10 @@ export function Game(props) {
                                         lostHeart = document.getElementById(`heart${tries}`)
                                         //heart exploding and disappearing
                                         lostHeart.style.opacity = "0"
+                                        //only play tune if you are not one but last
+                                        
                                         puff(tries);
-
+                                        
                                     }
                                     console.log("speed before: ++++++++++++=", players[n - 3].speed)
                                     players[n - 3].speed = 0;
@@ -346,8 +351,8 @@ export function Game(props) {
                                     drawPlayer(n - 3)
 
                                 } else {
-                                     //array of dead players
-                                   deadPlayers.push(n-3)
+                                    //array of dead players
+                                    deadPlayers.push(n - 3)
                                     //if 1: take away life and show game over
                                     if (players[n - 3].index === self.index) {
                                         tries = 3;
@@ -358,7 +363,12 @@ export function Game(props) {
                                         document.querySelector("#whoAmI").innerHTML = '<p> GAME OVER<br>'
                                             + `Better luck next time ${whoAmI}</p>`;
 
-                                        gameEnd()
+                                        //don't play if you are one but last
+                                        console.log("players.length inside game", players.length)
+                                        if (players.length > 2) {
+                                            gameEnd()
+                                        }
+
 
                                         props.socket.send(JSON.stringify({
                                             type: "removePlayer"
@@ -386,8 +396,8 @@ export function Game(props) {
                             }
                         }
                     )
-                     ///if there are dead players
-                     if (deadPlayers.length > 0) {
+                    ///if there are dead players
+                    if (deadPlayers.length > 0) {
                         //loop through dead players index in players array
                         deadPlayers.forEach((n) => {
                             //remove player from the tileMap
@@ -395,7 +405,7 @@ export function Game(props) {
                             let ind = tileMap.map[p.cRow][p.cCol].indexOf(n)
                             tileMap.map[p.cRow][p.cCol].splice(ind, 1)
                         })
-                     }
+                    }
                 }
                 if (b.count === 0) {
                     i = 4
@@ -444,7 +454,7 @@ export function Game(props) {
 /*let check = [b.col+b.count, b.col-b.count, b.row+b.count, b.row-b.count]
 for (let i=4; i--; i>0) {
     if (check[i]<14 && check[i]>0){
-        let spot 
+        let spot
         if (i<2){
             spot = tileMap[b.row][check[i]]
         } else {
