@@ -300,7 +300,7 @@ function puff(t) {
                         20,
                         10
                     )
-    
+                        let deadPlayers = []
                     spot.forEach(
                         (n) => {
                             console.log("what is n, while unexploding?", n)
@@ -329,6 +329,8 @@ function puff(t) {
                                     drawPlayer(n - 3)
     
                                 } else {
+                                    //array of dead players
+                                   deadPlayers.push(n-3)
                                     //if 1: take away life and show game over
                                     if (players[n - 3].index === self.index) {
                                         tries = 3;
@@ -339,6 +341,7 @@ function puff(t) {
                                         document.querySelector("#whoAmI").innerHTML = '<p> GAME OVER<br>'
                                             + `Better luck next time ${whoAmI}</p>`
                                             ;
+                                        
                                     }
     
                                 }
@@ -362,6 +365,17 @@ function puff(t) {
                             } 
                         }
                     )
+                     ///if there are dead players
+                     if (deadPlayers.length > 0) {
+                        //loop through dead players index in players array
+                        deadPlayers.forEach((n) => {
+                            //remove player from the tileMap
+                            let p = players[n]
+                            let ind = tileMap.map[p.cRow][p.cCol].indexOf(n)
+                            tileMap.map[p.cRow][p.cCol].splice(ind, 1)
+                        })
+                     }
+                     
                 }
                 if (b.count === 0) {
                     i = 4
