@@ -125,7 +125,7 @@ export function App() {
       case "seconds":
 
         leadSecs = msg.data;
-        document.querySelector('#time').innerHTML = `Count down: ${leadSecs}`;
+        document.querySelector('#time').innerHTML = `Count up: ${leadSecs}`;
 
         console.log("the timerMsg inside seconds case:", timerMsg)
 

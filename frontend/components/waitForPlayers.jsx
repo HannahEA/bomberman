@@ -113,7 +113,7 @@ export function WaitForPlayers(props) {
                 //used to render the countdown timer
                 leadSecs = msg.data;
                 console.log("lobby receives seconds:", leadSecs)
-                document.querySelector('#time').innerHTML = `Count down: ${leadSecs}`;
+                document.querySelector('#time').innerHTML = `Count up: ${leadSecs}`;
 
                 // if (leadSecs >= 2) {
 
@@ -157,7 +157,7 @@ export function WaitForPlayers(props) {
                     <div className="menu">
 
                         <span className="info">
-                            <h2 id="time" >Count down: 00</h2>
+                            <h2 id="time" >Count up: 00</h2>
                         </span>
 
                     </div>
