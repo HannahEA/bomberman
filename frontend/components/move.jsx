@@ -8,6 +8,7 @@ export function move(plI, direction, time) {
     
     //get player object
     let p = players[plI]
+    
     //get array of players current position in the tilemap
     let pArr = tileMap.map[p.cRow][p.cCol]
     //players index in the array of their current posiion
@@ -157,6 +158,7 @@ function checkPowerUps(p, plI) {
             //p.powerUps.splice(0,0,"bombs")
             p.powerUps.push("bombs")
             p.powerUps.push("bombs")
+            p.doubleBomb++
             console.log("player", plI, "has gained a power up. Bombs no.", p.powerUps)
             tileMap.map[p.cRow][p.cCol].splice(0,1)
         } else if (tileMap.map[p.cRow][p.cCol].includes(9)) {

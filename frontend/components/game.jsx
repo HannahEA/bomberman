@@ -326,14 +326,25 @@ export function Game(props) {
                                 //check players number of lives
                                 if (players[n - 3].lives > 1) {
                                     //Bomberman looses one life
-                                    players[n - 3].lives--
+                                    console.log("spot includes 7 and doubleBomb", spot.includes(7), players[n - 3].doubleBomb)
+                                    if ((spot.includes(7) && players[b.playerI].doubleBomb === 1) ||!spot.includes(7)) {
+                                        players[n - 3].lives--
+                                        players[b.playerI].doubleBomb++
+                                    } else if (players[b.playerI].doubleBomb === 2) {
+                                        players[b.playerI].doubleBomb = 0
+                                    }
+
+                                    
                                     if (players[n - 3].index === self.index) {
                                         //derive which heart to remove
                                         console.log("type of players.index", typeof (players[n - 3].index))
 
-
+                                        
                                         //determine number of tries
                                         tries = 3 - players[n - 3].lives
+
+                                        console.log("tries after 2x explosions:", tries)
+
                                         //remove heart that has the same number as the number of tries
                                         lostHeart = document.getElementById(`heart${tries}`)
                                         //heart exploding and disappearing
@@ -341,6 +352,7 @@ export function Game(props) {
                                         //only play tune if you are not one but last
                                         
                                         puff(tries);
+                                    
                                         
                                     }
                                     console.log("powerup before: ++++++++++++=", players[n - 3].powerUps)
