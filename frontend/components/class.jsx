@@ -212,6 +212,7 @@ export class Bomb {
         this.flames = 125
         this.bombs = 250
         this.speed = 375
+        this.num = 1
     }
 
     

@@ -39,6 +39,8 @@ export function move(plI, direction, time) {
     if (direction == " ") {
         console.log("how many bombs do you have?", )
         //create one bomb 
+        //CHANGE
+        let b
         b = new Bomb(p.cCol, p.cRow, p.cX, p.cY, time, plI)
         drawGrass( p.cX, p.cY)
         drawBomb(p.cX, p.cY, plI)
@@ -53,24 +55,27 @@ export function move(plI, direction, time) {
             if (p.powerUps[0] === "bombs") {
                 // create bomb next to player position 
                 console.log("new bomb",p.cCol+i, p.cRow, p.cX+(20*i), p.cY, time, plI )
-                let b
                 if (right){
                     b = new Bomb(p.cCol+1, p.cRow, p.cX+20, p.cY, time, plI)
+                    b.num =2
                     drawGrass( p.cX+20, p.cY)
                     drawBomb(p.cX+20, p.cY, plI)
                     tileMap.map[p.cRow][p.cCol+1].splice(0, 0, 7)
                 } else if (left) {
                     b = new Bomb(p.cCol-1, p.cRow, p.cX-20, p.cY, time, plI)
+                    b.num =2
                     drawGrass( p.cX-20, p.cY)
                     drawBomb( p.cX-20, p.cY, plI)
                     tileMap.map[p.cRow][p.cCol-i].splice(0, 0, 7)
                 } else if (up) {
                     b = new Bomb(p.cCol, p.cRow-1, p.cX, p.cY-10, time, plI)
+                    b.num =2
                     drawGrass( p.cX, p.cY-10)
                     drawBomb(p.cX, p.cY-10, plI)
                     tileMap.map[p.cRow-i][p.cCol].splice(0, 0, 7)
                 } else if (down) {
                     b = new Bomb(p.cCol, p.cRow+1, p.cX, p.cY+10, time, plI)
+                    b.num =2
                     drawGrass( p.cX, p.cY+10)
                     drawBomb(p.cX, p.cY+10, plI)
                     tileMap.map[p.cRow+i][p.cCol].splice(0, 0, 7)
@@ -159,7 +164,7 @@ function checkPowerUps(p, plI) {
             p.powerUps.push("bombs")
             p.powerUps.push("bombs")
             p.doubleBomb++
-            console.log("player", plI, "has gained a power up. Bombs no.", p.powerUps)
+            console.log("player", plI, "has gained a power up. Bombs no.", p.powerUps, "doubleBomb?")
             tileMap.map[p.cRow][p.cCol].splice(0,1)
         } else if (tileMap.map[p.cRow][p.cCol].includes(9)) {
             //p.flames++

@@ -326,35 +326,28 @@ export function Game(props) {
                                 //check players number of lives
                                 if (players[n - 3].lives > 1) {
                                     //Bomberman looses one life
-                                    console.log("spot includes 7 and doubleBomb", spot.includes(7), players[n - 3].doubleBomb)
-                                    if ((spot.includes(7) && players[b.playerI].doubleBomb === 1) ||!spot.includes(7)) {
+                                    console.log("spot includes 7 and doubleBomb", spot.includes(7), b.num)
+                                    //if (spot.includes(7) && (players[b.playerI].doubleBomb === 1)|| players[b.playerI].doubleBomb === 0) || !spot.includes(7) ) {
+                                    if ((spot.includes(7) && b.num === 1) || !spot.includes(7) ) {
+
                                         players[n - 3].lives--
-                                        players[b.playerI].doubleBomb++
-                                    } else if (players[b.playerI].doubleBomb === 2) {
-                                        players[b.playerI].doubleBomb = 0
-                                    }
+                                        //players[b.playerI].doubleBomb++
+                                        if (players[n - 3].index === self.index) {
+                                            //derive which heart to remove
+                                            console.log("type of players.index", typeof (players[n - 3].index))
+    
+    
+                                            //determine number of tries
+                                            tries = 3 - players[n - 3].lives
+                                            //remove heart that has the same number as the number of tries
+                                            lostHeart = document.getElementById(`heart${tries}`)
+                                            //heart exploding and disappearing
+                                            lostHeart.style.opacity = "0"
+                                            puff(tries);
+    
+                                        }
+                                    } 
 
-                                    
-                                    if (players[n - 3].index === self.index) {
-                                        //derive which heart to remove
-                                        console.log("type of players.index", typeof (players[n - 3].index))
-
-                                        
-                                        //determine number of tries
-                                        tries = 3 - players[n - 3].lives
-
-                                        console.log("tries after 2x explosions:", tries)
-
-                                        //remove heart that has the same number as the number of tries
-                                        lostHeart = document.getElementById(`heart${tries}`)
-                                        //heart exploding and disappearing
-                                        lostHeart.style.opacity = "0"
-                                        //only play tune if you are not one but last
-                                        
-                                        puff(tries);
-                                    
-                                        
-                                    }
                                     console.log("powerup before: ++++++++++++=", players[n - 3].powerUps)
                                     //players[n - 3].speed = 0;
                                     //players[n - 3].bombs = 0
@@ -409,8 +402,9 @@ export function Game(props) {
                             }
                         }
                     )
-                    ///if there are dead players
-                    if (deadPlayers.length > 0) {
+                    
+                     ///if there are dead players
+                     if (deadPlayers.length > 0) {
                         //loop through dead players index in players array
                         deadPlayers.forEach((n) => {
                             //remove player from the tileMap
