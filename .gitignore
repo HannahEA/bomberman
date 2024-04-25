@@ -23,6 +23,6 @@ backend/node_modules
 package-lock.json
 
 # Misc
-node_modules
+*/node_modules/*
 dist/
 .parcel-cache/
